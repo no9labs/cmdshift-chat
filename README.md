@@ -1,7 +1,7 @@
 # CmdShift
 
 <div align="center">
-  <img src="apps/web/public/cmdshift-logo.svg" alt="CmdShift Logo" width="200" height="200" />
+  <img src="apps/web/public/cmdshift-logo.svg" alt="CmdShift Logo" width="400" height="400" />
   
   <h3>AI Without Limits</h3>
   <p>Unlimited AI access at 50-70% lower costs using intelligent multi-model routing</p>
