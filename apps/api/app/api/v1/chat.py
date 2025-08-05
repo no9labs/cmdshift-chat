@@ -153,14 +153,21 @@ async def stream_response(
         if conversation_id and full_response and user_id:
             assistant_message = ChatMessage(role="assistant", content=full_response)
             all_messages = messages + [assistant_message]
-            asyncio.create_task(
-                memory_manager.store_conversation(
-                    conversation_id,
-                    user_id,
-                    all_messages,
-                    model
-                )
-            )
+            logger.info(f"[PRE-TASK] About to create async save task for conversation {conversation_id}")
+            async def save_with_logging():
+                try:
+                    logger.info(f"Starting save for conversation {conversation_id}")
+                    await memory_manager.store_conversation(
+                        conversation_id,
+                        user_id,
+                        all_messages,
+                        model
+                    )
+                    logger.info(f"Successfully saved conversation {conversation_id}")
+                except Exception as e:
+                    logger.error(f"Failed to save conversation {conversation_id}: {e}")
+
+            asyncio.create_task(save_with_logging())
 
 @router.post("/completions")
 async def chat_completions(request: ChatRequest, req: Request):
@@ -229,8 +236,14 @@ async def chat_completions(request: ChatRequest, req: Request):
             selected_model = selected_model_enum.value
             logger.info(f"Selected model string: {selected_model}")
         else:
-            selected_model = request.model
-            logger.info(f"Using user-specified model: {selected_model}")
+            # Map frontend model names to actual model names
+            model_mapping = {
+                "deepseek": "deepseek-chat",
+                "glm": "glm-4.5",
+                "qwen": "qwen3-235b-a22b"
+            }
+            selected_model = model_mapping.get(request.model, request.model)
+            logger.info(f"Using user-specified model: {request.model} -> {selected_model}")
         
         # Get provider
         # Extract provider name from model string
@@ -303,16 +316,24 @@ async def chat_completions(request: ChatRequest, req: Request):
             
             # Store the complete conversation including assistant response if conversation_id provided
             if request.conversation_id and request.user_id:
-                assistant_message = ChatMessage(role="assistant", content=response)
+                assistant_message = ChatMessage(role="assistant", content=response.content)
                 all_messages = messages + [assistant_message]
-                asyncio.create_task(
-                    memory_manager.store_conversation(
-                        request.conversation_id,
-                        request.user_id if request.user_id else "anonymous",
-                        all_messages,
-                        selected_model
-                    )
-                )
+                
+                logger.info(f"[PRE-TASK] About to create async save task for conversation {request.conversation_id}")
+                async def save_with_logging():
+                    try:
+                        logger.info(f"Starting save for conversation {request.conversation_id}")
+                        await memory_manager.store_conversation(
+                            request.conversation_id,
+                            request.user_id if request.user_id else "anonymous",
+                            all_messages,
+                            selected_model
+                        )
+                        logger.info(f"Successfully saved conversation {request.conversation_id}")
+                    except Exception as e:
+                        logger.error(f"Failed to save conversation {request.conversation_id}: {e}")
+                
+                asyncio.create_task(save_with_logging())
             
             return JSONResponse(
                 content={

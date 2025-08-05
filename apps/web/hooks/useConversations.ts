@@ -1,79 +1,63 @@
-'use client';
+"use client"
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react"
+import { createClient } from '@/lib/supabase/client'
 
 interface Conversation {
-  id: string;
-  title: string;
-  lastMessage: string;
-  timestamp: string;
-  userId: string;
-  messageCount: number;
+  id: string
+  title: string
+  created_at?: string
+  updated_at?: string
 }
 
-export function useConversations(initialConversations?: Conversation[]) {
-  const [conversations, setConversations] = useState<Conversation[]>(initialConversations || []);
-  const [isLoading, setIsLoading] = useState(!initialConversations);
-  const [error, setError] = useState<string | null>(null);
+export function useConversations() {
+  const [conversations, setConversations] = useState<Conversation[]>([])
+  const [loading, setLoading] = useState(true)
 
   const fetchConversations = async () => {
     try {
-      setIsLoading(true);
-      const response = await fetch('/web-api/conversations');
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
       
-      if (!response.ok) {
-        throw new Error('Failed to fetch conversations');
+      if (!user) {
+        setLoading(false)
+        return
       }
-      
-      const data = await response.json();
-      setConversations(data.conversations || []);
-      setError(null);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
-      setConversations([]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
-  const createConversation = async (title?: string, firstMessage?: string) => {
-    try {
-      const response = await fetch('/web-api/conversations', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ title, firstMessage }),
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to create conversation');
+      const response = await fetch('/web-api/conversations')
+      if (response.ok) {
+        const data = await response.json()
+        setConversations(data.conversations || [])
       }
-      
-      const newConversation = await response.json();
-      
-      // Add the new conversation to the list
-      setConversations(prev => [newConversation, ...prev]);
-      
-      return newConversation;
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
-      throw err;
+    } catch (error) {
+      console.error('Failed to fetch conversations:', error)
+    } finally {
+      setLoading(false)
     }
-  };
+  }
 
   useEffect(() => {
-    // Only fetch if we don't have initial conversations
-    if (!initialConversations) {
-      fetchConversations();
-    }
-  }, []);
+    fetchConversations()
 
-  return {
-    conversations,
-    isLoading,
-    error,
-    refetch: fetchConversations,
-    createConversation,
-  };
+    // Set up global refresh function
+    if (typeof window !== 'undefined') {
+      window.refreshConversations = fetchConversations
+    }
+
+    // Cleanup
+    return () => {
+      if (typeof window !== 'undefined') {
+        delete window.refreshConversations
+      }
+    }
+  }, [])
+
+  return { conversations, loading, refresh: fetchConversations }
+}
+
+// Extend Window interface
+declare global {
+  interface Window {
+    refreshConversations?: () => void
+  }
 }

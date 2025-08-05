@@ -152,11 +152,24 @@ class MemoryManager:
                 key = f"conv:{user_id}:{conv_id}"
                 last_msg = await redis_client.lindex(key, -1)
                 
+                # Get metadata (title) if it exists
+                meta_key = f"conv:meta:{user_id}:{conv_id}"
+                title = await redis_client.hget(meta_key, "title")
+                
                 if last_msg:
                     try:
                         msg = json.loads(last_msg)
+                        
+                        # Use generated title if available, otherwise use last message preview
+                        conv_title = title if title else None
+                        if not conv_title:
+                            # Fallback to last message preview
+                            last_content = msg.get("content", "New Conversation")
+                            conv_title = last_content[:50] + ("..." if len(last_content) > 50 else "")
+                        
                         conversations.append({
                             "id": conv_id,
+                            "title": conv_title,
                             "last_message": msg.get("content", "")[:100],
                             "timestamp": datetime.fromtimestamp(timestamp).isoformat(),
                             "role": msg.get("role", "unknown")

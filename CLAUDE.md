@@ -52,18 +52,21 @@ pnpm check-types
 # Code formatting
 pnpm format
 
+# Start services (required before running dev servers)
+brew services start postgresql@16 redis
+
 # API-specific commands (from apps/api/)
 cd apps/api
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
-uvicorn app.main:app --reload --port 8000
+uvicorn app.main:app --reload --port 8001  # Note: port 8001
 
 # Test subscription limits
 cd apps/api
 python test_subscription_limits.py
 
-# Database migrations (if needed)
+# Database migrations (Supabase)
 cd apps/web
 pnpm supabase migration new <migration_name>
 pnpm supabase db push
@@ -115,13 +118,13 @@ NEXT_PUBLIC_API_URL=http://localhost:8000
 SECRET_KEY=your-secret-key-here
 DATABASE_URL=postgresql://user:pass@localhost/cmdshift
 
-# Redis
+# Redis (required for caching and rate limiting)
 REDIS_URL=redis://localhost:6379
 
-# LLM Providers (required)
-DEEPSEEK_API_KEY=sk-...
-GLM_API_KEY=...
-QWEN_API_KEY=...
+# LLM Providers (at least one required)
+DEEPSEEK_API_KEY=sk-...  # For code tasks
+GLM_API_KEY=...         # For general/multilingual
+QWEN_API_KEY=...        # For math/reasoning
 
 # Vector DB (optional)
 PINECONE_API_KEY=...
@@ -136,15 +139,20 @@ SENTRY_DSN=...
 ### Model Router Algorithm
 The `ModelRouter` class in `app/services/router.py` implements intelligent model selection:
 1. Analyzes query to determine task type (code, math, general, etc.)
-2. Filters models by context window requirements
+2. Filters models by context window requirements AND API key availability
 3. Scores models based on task match, cost, and latency
 4. Falls back to available models if preferred model lacks API key
 5. Caches routing decisions for analytics
 
 **Model Specializations:**
-- **deepseek-chat**: Best for code and technical content (1.3¢/M tokens)
-- **glm-4.5**: Best for multilingual and creative tasks (1.5¢/M tokens)
-- **qwen3-2507**: Best for math and reasoning (1.0¢/M tokens)
+- **deepseek-chat**: Best for code and technical content ($0.27/M tokens)
+- **glm-4.5**: Best for general and technical tasks ($0.11/M tokens)
+- **qwen3-235b-a22b**: Best for general and multilingual tasks ($2.80/M tokens)
+
+**Context Windows:**
+- DeepSeek V3: 128K tokens
+- GLM-4.5: 128K tokens
+- Qwen3-235B: 32K tokens
 
 ### Subscription System
 - Uses Redis for fast limit checking with graceful degradation
@@ -175,9 +183,11 @@ client = OpenAI(
    - `complete()`: Main completion method
    - `stream()`: Streaming response method
 3. Add to `ModelType` enum in `/apps/api/app/models/llm.py`
-4. Update `ModelRouter` in `router.py` with model config
+4. Update `ModelRouter` in `router.py` with model config:
+   - Add to `self.models` dict with cost, specialties, context_window, latency, api_key, endpoint
 5. Add API key to `.env` and `config.py`
 6. Update model pricing in `/apps/api/app/api/v1/usage.py`
+7. Test with `test_subscription_limits.py` to ensure rate limiting works
 
 ### Implementing a New Feature
 1. Design API endpoint in FastAPI backend
@@ -211,20 +221,23 @@ python test_subscription_limits.py
 
 ### Frontend Issues
 - Check browser console for errors
-- Verify environment variables are loaded
+- Verify environment variables are loaded (NEXT_PUBLIC_* prefixed)
 - Use React DevTools for component inspection
 - Check Network tab for API responses
+- Port conflicts: Frontend runs on 3000, API on 8001
 
 ### Backend Issues
-- FastAPI auto-docs at http://localhost:8000/docs
+- FastAPI auto-docs at http://localhost:8001/docs
 - Check Redis connection with health endpoint
-- Verify API keys are correctly formatted
+- Verify API keys are correctly formatted (not placeholder "your-*")
 - Monitor logs for provider-specific errors
+- Test model routing: Check `scores` in routing decisions
 
 ### Monorepo Issues
 - Clear turbo cache: `rm -rf .turbo`
 - Reinstall dependencies: `pnpm install`
 - Check workspace resolution in pnpm-workspace.yaml
+- Turbo tasks defined in `/turbo.json`
 
 ## Critical Implementation Details
 
@@ -262,3 +275,13 @@ CmdShift aims to democratize AI access by:
 4. **Smart Features**: Persistent memory, artifacts, code execution
 
 Target users include developers, SMBs, and power users frustrated with expensive, rate-limited platforms.
+
+## Important Notes
+
+- The project uses Turborepo for monorepo management with PNPM workspaces
+- Authentication is handled by Supabase (client-side and server-side SDKs)
+- Redis is required for caching and rate limiting (graceful degradation if unavailable)
+- Model routing automatically falls back to available models based on API keys
+- Subscription tiers are enforced with proper 429 rate limiting responses
+- Frontend uses Next.js 15.4.5 with Turbopack for faster dev builds
+- Backend is async FastAPI with proper error handling patterns

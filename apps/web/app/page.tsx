@@ -1,14 +1,13 @@
-import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
+import { Sidebar } from "@/components/sidebar"
+import { ChatInterface } from "@/components/chat-interface"
 
-export default async function Home() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-
-  if (!user) {
-    redirect('/login')
-  }
-
-  // Redirect to new chat
-  redirect('/chat/new')
+export default function Home() {
+  return (
+    <div className="flex h-screen bg-gray-50">
+      <Sidebar />
+      <main className="flex-1 flex flex-col">
+        <ChatInterface />
+      </main>
+    </div>
+  )
 }

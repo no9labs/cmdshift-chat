@@ -54,7 +54,29 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  await supabase.auth.getUser()
+  // This will refresh the session if expired - required for Server Components
+  const { data: { user } } = await supabase.auth.getUser()
+  
+  console.log('Middleware - Path:', request.nextUrl.pathname, 'User:', user?.email || 'not authenticated')
+
+  // If user is not authenticated and trying to access protected routes
+  if (!user && (
+    request.nextUrl.pathname.startsWith('/chat') ||
+    request.nextUrl.pathname.startsWith('/profile') ||
+    request.nextUrl.pathname.startsWith('/settings') ||
+    request.nextUrl.pathname.startsWith('/usage')
+  )) {
+    console.log('Middleware - Redirecting to login, no user found')
+    return NextResponse.redirect(new URL('/login', request.url))
+  }
+
+  // If user is authenticated and trying to access auth pages
+  if (user && (
+    request.nextUrl.pathname.startsWith('/login') ||
+    request.nextUrl.pathname.startsWith('/signup')
+  )) {
+    return NextResponse.redirect(new URL('/chat/new', request.url))
+  }
 
   return response
 }

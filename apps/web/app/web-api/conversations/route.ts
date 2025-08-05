@@ -20,12 +20,15 @@ export async function GET(request: NextRequest) {
     const data = await response.json();
     
     // Transform backend format to frontend format
-    const conversations = data.conversations.map((conv: any) => ({
-      id: conv.id,
-      title: conv.last_message ? conv.last_message.substring(0, 50) + '...' : 'New Conversation',
-      createdAt: conv.timestamp || new Date().toISOString(),
-      preview: conv.last_message || ''
-    }));
+    const conversations = data.conversations.map((conv: any) => {
+      const title = conv.title || (conv.last_message ? conv.last_message.substring(0, 50) + '...' : 'New Conversation');
+      return {
+        id: conv.id,
+        title: title,
+        createdAt: conv.timestamp || new Date().toISOString(),
+        preview: conv.last_message || ''
+      };
+    });
 
     return NextResponse.json({ conversations });
   } catch (error) {

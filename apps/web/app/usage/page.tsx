@@ -3,9 +3,6 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge";
 import { 
   TrendingUp, 
   MessageSquare, 
@@ -96,196 +93,311 @@ export default function UsagePage() {
     checkUserAndFetchData();
   }, [router]);
 
+  const containerStyle = {
+    maxWidth: '1152px',
+    margin: '0 auto',
+    padding: '32px 16px'
+  };
+
+  const headerStyle = {
+    marginBottom: '32px'
+  };
+
+  const titleStyle = {
+    fontSize: '30px',
+    fontWeight: 'bold',
+    marginBottom: '8px'
+  };
+
+  const subtitleStyle = {
+    color: '#6b7280',
+    fontSize: '16px'
+  };
+
+  const gridStyle = {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+    gap: '16px',
+    marginBottom: '32px'
+  };
+
+  const cardStyle = {
+    backgroundColor: 'white',
+    borderRadius: '8px',
+    border: '1px solid #e5e7eb',
+    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+    overflow: 'hidden'
+  };
+
+  const cardHeaderStyle = {
+    padding: '16px',
+    borderBottom: '1px solid #f3f4f6',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center'
+  };
+
+  const cardContentStyle = {
+    padding: '16px'
+  };
+
+  const statValueStyle = {
+    fontSize: '24px',
+    fontWeight: 'bold',
+    marginBottom: '4px'
+  };
+
+  const statLabelStyle = {
+    fontSize: '12px',
+    color: '#6b7280'
+  };
+
+  const progressBarContainerStyle = {
+    width: '100%',
+    height: '8px',
+    backgroundColor: '#e5e7eb',
+    borderRadius: '4px',
+    overflow: 'hidden',
+    marginTop: '8px'
+  };
+
+  const progressBarFillStyle = (percentage: number) => ({
+    height: '100%',
+    backgroundColor: '#3b82f6',
+    width: `${percentage}%`,
+    transition: 'width 0.3s ease'
+  });
+
+  const modelBadgeStyle = {
+    display: 'inline-block',
+    padding: '2px 8px',
+    borderRadius: '4px',
+    fontSize: '12px',
+    fontWeight: '500',
+    backgroundColor: '#f3f4f6',
+    border: '1px solid #e5e7eb',
+    color: '#374151'
+  };
+
+  const costBadgeStyle = {
+    display: 'inline-block',
+    padding: '2px 8px',
+    borderRadius: '4px',
+    fontSize: '12px',
+    fontWeight: '500',
+    backgroundColor: '#f3f4f6',
+    color: '#374151'
+  };
+
+  const loadingContainerStyle = {
+    display: 'flex',
+    flexDirection: 'column' as const,
+    gap: '16px'
+  };
+
+  const skeletonStyle = {
+    height: '32px',
+    backgroundColor: '#e5e7eb',
+    borderRadius: '4px',
+    animation: 'pulse 2s ease-in-out infinite'
+  };
+
   if (loading) {
     return (
-      <div className="container mx-auto px-4 py-8 max-w-6xl">
-        <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-gray-200 rounded w-1/4"></div>
-          <div className="grid gap-4 md:grid-cols-4">
+      <div style={containerStyle}>
+        <div style={loadingContainerStyle}>
+          <div style={{ ...skeletonStyle, width: '25%' }}></div>
+          <div style={gridStyle}>
             {[1, 2, 3, 4].map(i => (
-              <div key={i} className="h-32 bg-gray-200 rounded"></div>
+              <div key={i} style={{ ...skeletonStyle, height: '128px' }}></div>
             ))}
           </div>
         </div>
+        <style jsx>{`
+          @keyframes pulse {
+            0%, 100% {
+              opacity: 1;
+            }
+            50% {
+              opacity: 0.5;
+            }
+          }
+        `}</style>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-6xl">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Usage Analytics</h1>
-        <p className="text-muted-foreground">Track your AI usage and costs across all models</p>
+    <div style={containerStyle}>
+      <div style={headerStyle}>
+        <h1 style={titleStyle}>Usage Analytics</h1>
+        <p style={subtitleStyle}>Track your AI usage and costs across all models</p>
       </div>
 
       {/* Summary Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Messages</CardTitle>
-            <MessageSquare className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{usage.total_messages.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">
-              All time
-            </p>
-          </CardContent>
-        </Card>
+      <div style={gridStyle}>
+        <div style={cardStyle}>
+          <div style={cardHeaderStyle}>
+            <span style={{ fontSize: '14px', fontWeight: '500' }}>Total Messages</span>
+            <MessageSquare size={16} color="#6b7280" />
+          </div>
+          <div style={cardContentStyle}>
+            <div style={statValueStyle}>{usage.total_messages.toLocaleString()}</div>
+            <p style={statLabelStyle}>All time</p>
+          </div>
+        </div>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Tokens Used</CardTitle>
-            <Zap className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
+        <div style={cardStyle}>
+          <div style={cardHeaderStyle}>
+            <span style={{ fontSize: '14px', fontWeight: '500' }}>Tokens Used</span>
+            <Zap size={16} color="#6b7280" />
+          </div>
+          <div style={cardContentStyle}>
+            <div style={statValueStyle}>
               {((usage.total_input_tokens + usage.total_output_tokens) / 1000).toFixed(1)}K
             </div>
-            <p className="text-xs text-muted-foreground">
-              Input + Output
-            </p>
-          </CardContent>
-        </Card>
+            <p style={statLabelStyle}>Input + Output</p>
+          </div>
+        </div>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Cost</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">${usage.total_cost.toFixed(4)}</div>
-            <p className="text-xs text-muted-foreground">
-              Estimated cost
-            </p>
-          </CardContent>
-        </Card>
+        <div style={cardStyle}>
+          <div style={cardHeaderStyle}>
+            <span style={{ fontSize: '14px', fontWeight: '500' }}>Total Cost</span>
+            <DollarSign size={16} color="#6b7280" />
+          </div>
+          <div style={cardContentStyle}>
+            <div style={statValueStyle}>${usage.total_cost.toFixed(4)}</div>
+            <p style={statLabelStyle}>Estimated cost</p>
+          </div>
+        </div>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Avg Cost/1K Tokens</CardTitle>
-            <BarChart3 className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
+        <div style={cardStyle}>
+          <div style={cardHeaderStyle}>
+            <span style={{ fontSize: '14px', fontWeight: '500' }}>Avg Cost/1K Tokens</span>
+            <BarChart3 size={16} color="#6b7280" />
+          </div>
+          <div style={cardContentStyle}>
+            <div style={statValueStyle}>
               ${usage.total_input_tokens + usage.total_output_tokens > 0 
                 ? ((usage.total_cost / (usage.total_input_tokens + usage.total_output_tokens)) * 1000).toFixed(4)
                 : '0.0000'}
             </div>
-            <p className="text-xs text-muted-foreground">
-              Blended rate
-            </p>
-          </CardContent>
-        </Card>
+            <p style={statLabelStyle}>Blended rate</p>
+          </div>
+        </div>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
         {/* Model Usage Breakdown */}
-        <Card className="md:col-span-1">
-          <CardHeader>
-            <CardTitle>Model Usage Distribution</CardTitle>
-            <CardDescription>Messages sent to each model</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
+        <div style={cardStyle}>
+          <div style={{ padding: '24px', borderBottom: '1px solid #e5e7eb' }}>
+            <h2 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '4px' }}>Model Usage Distribution</h2>
+            <p style={{ fontSize: '14px', color: '#6b7280' }}>Messages sent to each model</p>
+          </div>
+          <div style={{ padding: '24px' }}>
             {usage.model_breakdown.length > 0 ? (
-              usage.model_breakdown.map((model) => {
-                const percentage = usage.total_messages > 0 
-                  ? (model.count / usage.total_messages) * 100 
-                  : 0;
-                return (
-                  <div key={model.model} className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Badge variant="outline">{model.model}</Badge>
-                        <span className="text-sm text-muted-foreground">
-                          {model.count} messages
-                        </span>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {usage.model_breakdown.map((model) => {
+                  const percentage = usage.total_messages > 0 
+                    ? (model.count / usage.total_messages) * 100 
+                    : 0;
+                  return (
+                    <div key={model.model}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <span style={modelBadgeStyle}>{model.model}</span>
+                          <span style={{ fontSize: '14px', color: '#6b7280' }}>
+                            {model.count} messages
+                          </span>
+                        </div>
+                        <span style={{ fontSize: '14px', fontWeight: '500' }}>{percentage.toFixed(1)}%</span>
                       </div>
-                      <span className="text-sm font-medium">{percentage.toFixed(1)}%</span>
+                      <div style={progressBarContainerStyle}>
+                        <div style={progressBarFillStyle(percentage)} />
+                      </div>
                     </div>
-                    <Progress value={percentage} className="h-2" />
-                  </div>
-                );
-              })
+                  );
+                })}
+              </div>
             ) : (
-              <p className="text-sm text-muted-foreground">No model usage data yet</p>
+              <p style={{ fontSize: '14px', color: '#6b7280' }}>No model usage data yet</p>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {/* Recent Activity */}
-        <Card className="md:col-span-1">
-          <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
-            <CardDescription>Your usage over the last 7 days</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {usage.recent_activity.length > 0 ? (
-                usage.recent_activity.map((day, index) => (
-                  <div key={index} className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm">{day.date}</span>
+        <div style={cardStyle}>
+          <div style={{ padding: '24px', borderBottom: '1px solid #e5e7eb' }}>
+            <h2 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '4px' }}>Recent Activity</h2>
+            <p style={{ fontSize: '14px', color: '#6b7280' }}>Your usage over the last 7 days</p>
+          </div>
+          <div style={{ padding: '24px' }}>
+            {usage.recent_activity.length > 0 ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {usage.recent_activity.map((day, index) => (
+                  <div key={index} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <Calendar size={16} color="#6b7280" />
+                      <span style={{ fontSize: '14px' }}>{day.date}</span>
                     </div>
-                    <div className="flex items-center gap-4">
-                      <span className="text-sm text-muted-foreground">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                      <span style={{ fontSize: '14px', color: '#6b7280' }}>
                         {day.messages} msgs
                       </span>
-                      <Badge variant="secondary">${day.cost.toFixed(3)}</Badge>
+                      <span style={costBadgeStyle}>${day.cost.toFixed(3)}</span>
                     </div>
                   </div>
-                ))
-              ) : (
-                <p className="text-sm text-muted-foreground">No recent activity</p>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+                ))}
+              </div>
+            ) : (
+              <p style={{ fontSize: '14px', color: '#6b7280' }}>No recent activity</p>
+            )}
+          </div>
+        </div>
       </div>
 
-      {/* Usage Tips */}
-      <Card className="mt-6">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <TrendingUp className="h-5 w-5" />
+      {/* Usage Insights */}
+      <div style={{ ...cardStyle, marginTop: '24px' }}>
+        <div style={{ padding: '24px', borderBottom: '1px solid #e5e7eb' }}>
+          <h2 style={{ fontSize: '18px', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <TrendingUp size={20} />
             Usage Insights
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 md:grid-cols-3">
-            <div className="space-y-2">
-              <p className="text-sm font-medium">Most Used Model</p>
-              <p className="text-2xl font-bold">
+          </h2>
+        </div>
+        <div style={{ padding: '24px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '24px' }}>
+            <div>
+              <p style={{ fontSize: '14px', fontWeight: '500', marginBottom: '8px' }}>Most Used Model</p>
+              <p style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '4px' }}>
                 {usage.model_breakdown[0]?.model || 'N/A'}
               </p>
-              <p className="text-xs text-muted-foreground">
+              <p style={{ fontSize: '12px', color: '#6b7280' }}>
                 {usage.model_breakdown[0] && usage.total_messages > 0
                   ? `${((usage.model_breakdown[0].count / usage.total_messages) * 100).toFixed(0)}% of your usage`
                   : 'Start chatting to see insights'}
               </p>
             </div>
-            <div className="space-y-2">
-              <p className="text-sm font-medium">Average Daily Messages</p>
-              <p className="text-2xl font-bold">
+            <div>
+              <p style={{ fontSize: '14px', fontWeight: '500', marginBottom: '8px' }}>Average Daily Messages</p>
+              <p style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '4px' }}>
                 {usage.recent_activity.length > 0 
                   ? Math.round(usage.recent_activity.reduce((acc, day) => acc + day.messages, 0) / usage.recent_activity.length)
                   : 0}
               </p>
-              <p className="text-xs text-muted-foreground">
+              <p style={{ fontSize: '12px', color: '#6b7280' }}>
                 Based on last 7 days
               </p>
             </div>
-            <div className="space-y-2">
-              <p className="text-sm font-medium">Cost Efficiency</p>
-              <p className="text-2xl font-bold text-green-600">90%</p>
-              <p className="text-xs text-muted-foreground">
+            <div>
+              <p style={{ fontSize: '14px', fontWeight: '500', marginBottom: '8px' }}>Cost Efficiency</p>
+              <p style={{ fontSize: '24px', fontWeight: 'bold', color: '#10b981', marginBottom: '4px' }}>90%</p>
+              <p style={{ fontSize: '12px', color: '#6b7280' }}>
                 Savings vs. competitor pricing
               </p>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }

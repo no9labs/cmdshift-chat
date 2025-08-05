@@ -4,10 +4,6 @@ import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
 import { TIER_INFO, SubscriptionTier } from '@/lib/types/subscription';
 import { Loader2, CheckCircle, XCircle, CreditCard, TrendingUp, Calendar, AlertCircle } from 'lucide-react';
 
@@ -104,14 +100,25 @@ async function getUsageStats(userId: string) {
 function SubscriptionBadge({ tier }: { tier: SubscriptionTier }) {
   const tierInfo = TIER_INFO[tier];
   const badgeColors = {
-    [SubscriptionTier.FREE]: 'bg-gray-100 text-gray-800',
-    [SubscriptionTier.STARTER]: 'bg-blue-100 text-blue-800',
-    [SubscriptionTier.PRO]: 'bg-purple-100 text-purple-800',
-    [SubscriptionTier.BUSINESS]: 'bg-amber-100 text-amber-800',
+    [SubscriptionTier.FREE]: { bg: '#f3f4f6', text: '#374151' },
+    [SubscriptionTier.STARTER]: { bg: '#dbeafe', text: '#1e40af' },
+    [SubscriptionTier.PRO]: { bg: '#e9d5ff', text: '#6b21a8' },
+    [SubscriptionTier.BUSINESS]: { bg: '#fef3c7', text: '#92400e' },
   };
   
+  const colors = badgeColors[tier];
+  
   return (
-    <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${badgeColors[tier]}`}>
+    <span style={{
+      display: 'inline-flex',
+      alignItems: 'center',
+      padding: '4px 12px',
+      borderRadius: '9999px',
+      fontSize: '14px',
+      fontWeight: '500',
+      backgroundColor: colors.bg,
+      color: colors.text
+    }}>
       {tierInfo.name}
     </span>
   );
@@ -194,7 +201,11 @@ export default function ProfilePage() {
   };
   
   if (loading || !user || !profile) {
-    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}>
+        Loading...
+      </div>
+    );
   }
   
   const tier = (profile?.subscription_tier || 'FREE') as SubscriptionTier;
@@ -241,194 +252,265 @@ export default function ProfilePage() {
   
   const showUpgradeButton = tier === SubscriptionTier.FREE || tier === SubscriptionTier.STARTER;
   
+  const containerStyle = {
+    maxWidth: '896px',
+    margin: '0 auto',
+    padding: '32px 16px'
+  };
+
+  const cardStyle = {
+    backgroundColor: 'white',
+    borderRadius: '8px',
+    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+    border: '1px solid #e5e7eb',
+    marginBottom: '24px'
+  };
+
+  const cardHeaderStyle = {
+    padding: '24px',
+    borderBottom: '1px solid #e5e7eb'
+  };
+
+  const cardContentStyle = {
+    padding: '24px'
+  };
+
+  const titleStyle = {
+    fontSize: '20px',
+    fontWeight: '600',
+    margin: '0 0 8px 0',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between'
+  };
+
+  const descriptionStyle = {
+    fontSize: '14px',
+    color: '#6b7280',
+    margin: 0
+  };
+
+  const buttonStyle = {
+    padding: '10px 20px',
+    backgroundColor: '#007bff',
+    color: 'white',
+    border: 'none',
+    borderRadius: '5px',
+    fontSize: '14px',
+    cursor: 'pointer',
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '8px'
+  };
+
+  const buttonOutlineStyle = {
+    ...buttonStyle,
+    backgroundColor: 'white',
+    color: '#374151',
+    border: '1px solid #d1d5db'
+  };
+
+  const separatorStyle = {
+    height: '1px',
+    backgroundColor: '#e5e7eb',
+    margin: '20px 0'
+  };
+
+  const successAlertStyle = {
+    backgroundColor: '#d1fae5',
+    border: '1px solid #6ee7b7',
+    borderRadius: '8px',
+    padding: '16px',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    marginBottom: '24px',
+    color: '#064e3b'
+  };
+
+  const warningAlertStyle = {
+    backgroundColor: '#fef3c7',
+    border: '1px solid #fcd34d',
+    borderRadius: '8px',
+    padding: '16px',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    marginBottom: '24px',
+    color: '#78350f'
+  };
+
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <h1 className="text-3xl font-bold mb-8">Profile</h1>
+    <div style={containerStyle}>
+      <h1 style={{ fontSize: '30px', fontWeight: 'bold', marginBottom: '32px' }}>Profile</h1>
       
-      {/* Success/Cancel Notifications - keep existing */}
+      {/* Success/Cancel Notifications */}
       {upgradeStatus === 'success' && (
-        <Card className="mb-6 border-green-200 bg-green-50">
-          <CardContent className="flex items-center gap-2 pt-6">
-            <CheckCircle className="h-5 w-5 text-green-600" />
-            <p className="text-sm text-green-800">
-              Subscription upgraded successfully! You now have access to all features.
-            </p>
-          </CardContent>
-        </Card>
+        <div style={successAlertStyle}>
+          <CheckCircle size={20} />
+          <p style={{ margin: 0, fontSize: '14px' }}>
+            Subscription upgraded successfully! You now have access to all features.
+          </p>
+        </div>
       )}
       
       {upgradeStatus === 'cancelled' && (
-        <Card className="mb-6 border-yellow-200 bg-yellow-50">
-          <CardContent className="flex items-center gap-2 pt-6">
-            <XCircle className="h-5 w-5 text-yellow-600" />
-            <p className="text-sm text-yellow-800">
-              Subscription upgrade cancelled. You can upgrade anytime.
-            </p>
-          </CardContent>
-        </Card>
+        <div style={warningAlertStyle}>
+          <XCircle size={20} />
+          <p style={{ margin: 0, fontSize: '14px' }}>
+            Subscription upgrade cancelled. You can upgrade anytime.
+          </p>
+        </div>
       )}
 
-      <div className="grid gap-6">
-        {/* Account Information */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Account Information</CardTitle>
-            <CardDescription>Your account details and subscription status</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <p className="text-sm text-muted-foreground">Email</p>
-              <p className="font-medium">{user?.email}</p>
-            </div>
-            <Separator />
-            <div>
-              <p className="text-sm text-muted-foreground">User ID</p>
-              <p className="font-mono text-sm">{user?.id}</p>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Subscription Status */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center justify-between">
-              Subscription
-              <Badge variant={profile.subscription_tier === 'PRO' ? 'default' : profile.subscription_tier === 'STARTER' ? 'secondary' : 'outline'}>
-                {profile.subscription_tier}
-              </Badge>
-            </CardTitle>
-            <CardDescription>
-              {profile.subscription_tier === 'PRO' ? 'Unlimited conversations' :
-               profile.subscription_tier === 'STARTER' ? '2,000 messages per month' :
-               '50 messages per day'}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <CreditCard className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm">Monthly cost</span>
-                </div>
-                <span className="font-medium">
-                  {profile.subscription_tier === 'PRO' ? '$19.99' :
-                   profile.subscription_tier === 'STARTER' ? '$9.99' :
-                   '$0.00'}
-                </span>
-              </div>
-              
-              {profile.subscription_tier !== 'PRO' && (
-                <>
-                  <Separator />
-                  <div className="space-y-2">
-                    <p className="text-sm font-medium">Upgrade to unlock more</p>
-                    <div className="flex gap-2">
-                      {profile.subscription_tier === 'FREE' && (
-                        <>
-                          <Button 
-                            onClick={() => handleUpgrade('starter')} 
-                            variant="outline" 
-                            disabled={isUpgrading}
-                          >
-                            {isUpgrading ? (
-                              <>
-                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                Loading...
-                              </>
-                            ) : (
-                              'Upgrade to Starter'
-                            )}
-                          </Button>
-                          <Button 
-                            onClick={() => handleUpgrade('pro')} 
-                            disabled={isUpgrading}
-                          >
-                            {isUpgrading ? (
-                              <>
-                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                Loading...
-                              </>
-                            ) : (
-                              'Upgrade to Pro'
-                            )}
-                          </Button>
-                        </>
-                      )}
-                      {profile.subscription_tier === 'STARTER' && (
-                        <Button 
-                          onClick={() => handleUpgrade('pro')} 
-                          disabled={isUpgrading}
-                        >
-                          {isUpgrading ? (
-                            <>
-                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                              Loading...
-                            </>
-                          ) : (
-                            'Upgrade to Pro'
-                          )}
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                </>
-              )}
-              
-              {profile.subscription_tier !== 'FREE' && (
-                <>
-                  <Separator />
-                  <Button variant="outline" className="w-full" disabled>
-                    Manage Subscription
-                  </Button>
-                </>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Usage Statistics */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5" />
-              Usage Statistics
-            </CardTitle>
-            <CardDescription>Your usage for the current period</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Messages today</span>
-                <span className="font-medium">{messagesUsedToday}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Messages this month</span>
-                <span className="font-medium">{messagesUsedThisMonth}</span>
-              </div>
-              
-              {profile.subscription_tier !== 'PRO' && (
-                <>
-                  <Separator />
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between text-sm">
-                      <span>Daily limit</span>
-                      <span className="font-medium">
-                        {messagesUsedToday} / {profile.subscription_tier === 'FREE' ? '50' : '∞'}
-                      </span>
-                    </div>
-                    {profile.subscription_tier === 'STARTER' && (
-                      <div className="flex items-center justify-between text-sm">
-                        <span>Monthly limit</span>
-                        <span className="font-medium">{messagesUsedThisMonth} / 2,000</span>
-                      </div>
-                    )}
-                  </div>
-                </>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+      {/* Account Information */}
+      <div style={cardStyle}>
+        <div style={cardHeaderStyle}>
+          <h2 style={titleStyle}>Account Information</h2>
+          <p style={descriptionStyle}>Your account details and subscription status</p>
+        </div>
+        <div style={cardContentStyle}>
+          <div style={{ marginBottom: '16px' }}>
+            <p style={{ fontSize: '14px', color: '#6b7280', marginBottom: '4px' }}>Email</p>
+            <p style={{ fontWeight: '500', margin: 0 }}>{user?.email}</p>
+          </div>
+          <div style={separatorStyle} />
+          <div>
+            <p style={{ fontSize: '14px', color: '#6b7280', marginBottom: '4px' }}>User ID</p>
+            <p style={{ fontFamily: 'monospace', fontSize: '14px', margin: 0 }}>{user?.id}</p>
+          </div>
+        </div>
       </div>
+
+      {/* Subscription Status */}
+      <div style={cardStyle}>
+        <div style={cardHeaderStyle}>
+          <h2 style={titleStyle}>
+            Subscription
+            <SubscriptionBadge tier={tier} />
+          </h2>
+          <p style={descriptionStyle}>
+            {profile.subscription_tier === 'PRO' ? 'Unlimited conversations' :
+             profile.subscription_tier === 'STARTER' ? '2,000 messages per month' :
+             '50 messages per day'}
+          </p>
+        </div>
+        <div style={cardContentStyle}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <CreditCard size={16} color="#6b7280" />
+              <span style={{ fontSize: '14px' }}>Monthly cost</span>
+            </div>
+            <span style={{ fontWeight: '500' }}>
+              {profile.subscription_tier === 'PRO' ? '$19.99' :
+               profile.subscription_tier === 'STARTER' ? '$9.99' :
+               '$0.00'}
+            </span>
+          </div>
+          
+          {profile.subscription_tier !== 'PRO' && (
+            <>
+              <div style={separatorStyle} />
+              <div>
+                <p style={{ fontSize: '14px', fontWeight: '500', marginBottom: '12px' }}>Upgrade to unlock more</p>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  {profile.subscription_tier === 'FREE' && (
+                    <>
+                      <button 
+                        onClick={() => handleUpgrade('starter')} 
+                        style={buttonOutlineStyle}
+                        disabled={isUpgrading}
+                      >
+                        {isUpgrading && <Loader2 size={16} className="animate-spin" />}
+                        {isUpgrading ? 'Loading...' : 'Upgrade to Starter'}
+                      </button>
+                      <button 
+                        onClick={() => handleUpgrade('pro')} 
+                        style={buttonStyle}
+                        disabled={isUpgrading}
+                      >
+                        {isUpgrading && <Loader2 size={16} className="animate-spin" />}
+                        {isUpgrading ? 'Loading...' : 'Upgrade to Pro'}
+                      </button>
+                    </>
+                  )}
+                  {profile.subscription_tier === 'STARTER' && (
+                    <button 
+                      onClick={() => handleUpgrade('pro')} 
+                      style={buttonStyle}
+                      disabled={isUpgrading}
+                    >
+                      {isUpgrading && <Loader2 size={16} className="animate-spin" />}
+                      {isUpgrading ? 'Loading...' : 'Upgrade to Pro'}
+                    </button>
+                  )}
+                </div>
+              </div>
+            </>
+          )}
+          
+          {profile.subscription_tier !== 'FREE' && (
+            <>
+              <div style={separatorStyle} />
+              <button style={{ ...buttonOutlineStyle, width: '100%', opacity: 0.5, cursor: 'not-allowed' }} disabled>
+                Manage Subscription
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Usage Statistics */}
+      <div style={cardStyle}>
+        <div style={cardHeaderStyle}>
+          <h2 style={{ ...titleStyle, gap: '8px' }}>
+            <TrendingUp size={20} />
+            Usage Statistics
+          </h2>
+          <p style={descriptionStyle}>Your usage for the current period</p>
+        </div>
+        <div style={cardContentStyle}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+            <span style={{ fontSize: '14px', color: '#6b7280' }}>Messages today</span>
+            <span style={{ fontWeight: '500' }}>{messagesUsedToday}</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <span style={{ fontSize: '14px', color: '#6b7280' }}>Messages this month</span>
+            <span style={{ fontWeight: '500' }}>{messagesUsedThisMonth}</span>
+          </div>
+          
+          {profile.subscription_tier !== 'PRO' && (
+            <>
+              <div style={separatorStyle} />
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '14px', marginBottom: '8px' }}>
+                  <span>Daily limit</span>
+                  <span style={{ fontWeight: '500' }}>
+                    {messagesUsedToday} / {profile.subscription_tier === 'FREE' ? '50' : '∞'}
+                  </span>
+                </div>
+                {profile.subscription_tier === 'STARTER' && (
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '14px' }}>
+                    <span>Monthly limit</span>
+                    <span style={{ fontWeight: '500' }}>{messagesUsedThisMonth} / 2,000</span>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+
+      <style jsx>{`
+        @keyframes spin {
+          to {
+            transform: rotate(360deg);
+          }
+        }
+        .animate-spin {
+          animation: spin 1s linear infinite;
+        }
+      `}</style>
     </div>
   );
 }

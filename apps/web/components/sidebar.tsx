@@ -1,216 +1,235 @@
-'use client';
+"use client"
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { useRouter, usePathname } from 'next/navigation';
-import { ChevronLeft, ChevronRight, MessageSquare, FolderOpen, FileText, Plus } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { useConversations } from '@/hooks/useConversations';
+import { useState, useEffect } from "react"
+import { useRouter, usePathname } from "next/navigation"
+import { ChevronLeft, ChevronRight, Plus, Settings, LogOut, CreditCard, User } from "lucide-react"
+import { createClient } from "@/lib/supabase/client"
+import { useConversations } from "@/hooks/useConversations"
+import Link from "next/link"
 
-interface SidebarProps {
-  user: any;
-  initialConversations?: any[];
-}
+export function Sidebar() {
+  const [collapsed, setCollapsed] = useState(false)
+  const [userEmail, setUserEmail] = useState<string | null>(null)
+  const [dropdownOpen, setDropdownOpen] = useState(false)
+  const pathname = usePathname()
+  const router = useRouter()
+  const supabase = createClient()
+  const { conversations } = useConversations()
 
-export function Sidebar({ user, initialConversations = [] }: SidebarProps) {
-  const [collapsed, setCollapsed] = useState(false);
-  const pathname = usePathname();
-  const router = useRouter();
-  
-  // Use the hook with initial data
-  const { conversations, createConversation, isLoading, refetch } = useConversations(initialConversations);
-
-  // Expose refresh function to window
   useEffect(() => {
-    (window as any).refreshConversations = refetch;
-    
-    // Cleanup on unmount
-    return () => {
-      delete (window as any).refreshConversations;
-    };
-  }, [refetch]);
-
-  const handleNewChat = async () => {
-    const newConversation = await createConversation();
-    if (newConversation) {
-      router.push(`/chat/${newConversation.id}`);
+    const fetchUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        setUserEmail(user.email || null)
+      }
     }
-  };
+    fetchUser()
+  }, [supabase])
 
-  const navItems = [
-    { icon: MessageSquare, label: 'Chats', href: '/chat/new', active: pathname?.startsWith('/chat') },
-    { icon: FolderOpen, label: 'Projects', href: '/projects', active: pathname === '/projects' },
-    { icon: FileText, label: 'Artifacts', href: '/artifacts', active: pathname === '/artifacts' },
-  ];
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const dropdown = document.getElementById('user-dropdown')
+      const button = document.getElementById('user-dropdown-button')
+      if (dropdown && button && !dropdown.contains(event.target as Node) && !button.contains(event.target as Node)) {
+        setDropdownOpen(false)
+      }
+    }
+
+    if (dropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside)
+      return () => document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [dropdownOpen])
+
+  const handleSignOut = async () => {
+    console.log('Sign out clicked')
+    try {
+      const { error } = await supabase.auth.signOut()
+      if (error) {
+        console.error('Sign out error:', error)
+      }
+      localStorage.clear()
+      sessionStorage.clear()
+      window.location.href = "/login"
+    } catch (err) {
+      console.error('Sign out failed:', err)
+      // Force redirect even if there's an error
+      window.location.href = "/login"
+    }
+  }
+
+  const handleNewChat = () => {
+    router.push("/chat/new")
+  }
 
   return (
-    <div className={cn(
-      "flex flex-col border-r bg-background transition-all duration-300",
-      collapsed ? "w-16" : "w-64"
-    )}>
-      {/* Logo and collapse button */}
-      <div className="flex h-14 items-center justify-between px-4 border-b">
-        {!collapsed && (
-          <Link href="/" className="flex items-center space-x-2">
-            <span className="text-xl font-bold">CmdShift</span>
-          </Link>
-        )}
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => setCollapsed(!collapsed)}
-          className="h-8 w-8"
-        >
-          {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
-        </Button>
-      </div>
-
-      {/* New chat button */}
-      <div className="p-4">
-        <Button 
-          onClick={handleNewChat}
-          className="w-full justify-start" 
-          variant="outline"
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          {!collapsed && "New chat"}
-        </Button>
-      </div>
-
-      {/* Main navigation */}
-      <nav className="space-y-1 px-2">
-        {navItems.map((item) => (
-          <Link
-            key={item.href}
-            href={item.href}
-            className={cn(
-              "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
-              item.active
-                ? "bg-accent text-accent-foreground"
-                : "hover:bg-accent/50 text-muted-foreground hover:text-accent-foreground",
-              collapsed && "justify-center"
-            )}
-          >
-            <item.icon className="h-4 w-4" />
-            {!collapsed && <span>{item.label}</span>}
-          </Link>
-        ))}
-      </nav>
-
-      {/* Recent conversations */}
-      {!collapsed && (
-        <div className="flex-1 flex flex-col px-2 py-4">
-          <h3 className="mb-2 px-3 text-xs font-medium text-muted-foreground">Recent</h3>
-          <ScrollArea className="flex-1">
-            <div className="space-y-1">
-              {conversations.map((conv) => {
-                const isActive = pathname === `/chat/${conv.id}`;
-                return (
-                  <Link
-                    key={conv.id}
-                    href={`/chat/${conv.id}`}
-                    className={cn(
-                      "flex flex-col gap-1 rounded-lg px-3 py-2 text-sm transition-colors",
-                      isActive
-                        ? "bg-accent text-accent-foreground"
-                        : "hover:bg-accent/50 text-muted-foreground hover:text-accent-foreground"
-                    )}
-                  >
-                    <span className="font-medium truncate">{conv.title}</span>
-                    {conv.lastMessage && (
-                      <span className="text-xs text-muted-foreground truncate">
-                        {conv.lastMessage}
-                      </span>
-                    )}
-                  </Link>
-                );
-              })}
-              {conversations.length === 0 && !isLoading && (
-                <p className="px-3 text-sm text-muted-foreground">No conversations yet</p>
-              )}
-            </div>
-          </ScrollArea>
+    <aside style={{
+      width: collapsed ? '80px' : '250px',
+      backgroundColor: '#f5f5f5',
+      padding: '20px',
+      display: 'flex',
+      flexDirection: 'column',
+      height: '100vh',
+      position: 'relative',
+      transition: 'width 0.3s ease',
+      borderRight: '1px solid #ddd'
+    }}>
+      <div style={{ flex: 1, overflow: 'hidden' }}>
+        {/* Logo */}
+        <div style={{ marginBottom: '30px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <h1 style={{ fontSize: collapsed ? '0' : '24px', margin: 0, transition: 'font-size 0.3s' }}>CmdShift</h1>
         </div>
-      )}
 
-      {/* Bottom section */}
-      <div className="mt-auto border-t p-2 space-y-1">
-        <Link
-          href="/usage"
-          className={cn(
-            "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors hover:bg-accent/50",
-            collapsed && "justify-center"
-          )}
+        {/* New Chat Button */}
+        <button
+          onClick={handleNewChat}
+          style={{
+            width: '100%',
+            padding: '10px',
+            marginBottom: '20px',
+            backgroundColor: '#007bff',
+            color: 'white',
+            border: 'none',
+            borderRadius: '5px',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '5px'
+          }}
         >
-          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-          </svg>
-          {!collapsed && <span>Usage</span>}
-        </Link>
-        
-        <Link
-          href="/settings"
-          className={cn(
-            "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors hover:bg-accent/50",
-            collapsed && "justify-center"
-          )}
-        >
-          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-          </svg>
-          {!collapsed && <span>Settings</span>}
-        </Link>
+          <Plus size={20} />
+          {!collapsed && 'New Chat'}
+        </button>
 
-        {/* User profile */}
-        {user && (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                className={cn(
-                  "w-full justify-start gap-3 px-3",
-                  collapsed && "justify-center px-2"
-                )}
-              >
-                <Avatar className="h-6 w-6">
-                  <AvatarFallback className="text-xs">
-                    {user.email?.[0]?.toUpperCase() || 'U'}
-                  </AvatarFallback>
-                </Avatar>
-                {!collapsed && (
-                  <div className="flex-1 text-left">
-                    <p className="text-sm font-medium truncate">{user.email}</p>
-                    <p className="text-xs text-muted-foreground">PRO Plan</p>
-                  </div>
-                )}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuItem asChild>
-                <Link href="/profile">Profile</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/settings">Settings</Link>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                Sign out
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+        {/* Chat History */}
+        {!collapsed && (
+          <div>
+            <h3 style={{ fontSize: '14px', color: '#666', marginBottom: '10px' }}>Recent</h3>
+            <nav style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+              {conversations.map((conversation) => (
+                <Link
+                  key={conversation.id}
+                  href={`/chat/${conversation.id}`}
+                  style={{
+                    padding: '8px',
+                    borderRadius: '5px',
+                    textDecoration: 'none',
+                    color: '#333',
+                    backgroundColor: pathname === `/chat/${conversation.id}` ? '#e0e0e0' : 'transparent',
+                    fontSize: '14px',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap'
+                  }}
+                >
+                  {conversation.title}
+                </Link>
+              ))}
+            </nav>
+          </div>
         )}
       </div>
-    </div>
-  );
+
+      {/* User Profile Section */}
+      <div style={{ borderTop: '1px solid #ddd', paddingTop: '20px', position: 'relative' }}>
+        <button
+          id="user-dropdown-button"
+          onClick={() => setDropdownOpen(!dropdownOpen)}
+          style={{
+            width: '100%',
+            padding: '10px',
+            border: 'none',
+            backgroundColor: 'transparent',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px'
+          }}
+        >
+          <div style={{
+            width: '32px',
+            height: '32px',
+            borderRadius: '50%',
+            backgroundColor: '#007bff',
+            color: 'white',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '14px',
+            flexShrink: 0
+          }}>
+            {userEmail ? userEmail[0].toUpperCase() : 'G'}
+          </div>
+          {!collapsed && (
+            <span style={{ fontSize: '14px', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              {userEmail || 'Guest'}
+            </span>
+          )}
+        </button>
+
+        {/* Dropdown Menu */}
+        {dropdownOpen && (
+          <div 
+            id="user-dropdown"
+            style={{
+            position: 'absolute',
+            bottom: '100%',
+            left: '10px',
+            right: '10px',
+            backgroundColor: 'white',
+            border: '1px solid #ddd',
+            borderRadius: '5px',
+            boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+            marginBottom: '10px'
+          }}>
+            <Link href="/profile" style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px', textDecoration: 'none', color: '#333', borderBottom: '1px solid #eee' }}>
+              <User size={16} /> Profile
+            </Link>
+            <Link href="/pricing" style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px', textDecoration: 'none', color: '#333', borderBottom: '1px solid #eee' }}>
+              <CreditCard size={16} /> Upgrade Plan
+            </Link>
+            <Link href="/settings" style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px', textDecoration: 'none', color: '#333', borderBottom: '1px solid #eee' }}>
+              <Settings size={16} /> Settings
+            </Link>
+            <Link href="/usage" style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px', textDecoration: 'none', color: '#333', borderBottom: '1px solid #eee' }}>
+              <User size={16} /> Usage
+            </Link>
+            <button 
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                handleSignOut()
+              }} 
+              style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px', width: '100%', border: 'none', backgroundColor: 'transparent', cursor: 'pointer', color: '#dc3545', textAlign: 'left' }}
+            >
+              <LogOut size={16} /> Sign Out
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Collapse Toggle */}
+      <button
+        onClick={() => setCollapsed(!collapsed)}
+        style={{
+          position: 'absolute',
+          right: '-15px',
+          top: '50%',
+          transform: 'translateY(-50%)',
+          width: '30px',
+          height: '30px',
+          borderRadius: '50%',
+          backgroundColor: 'white',
+          border: '1px solid #ddd',
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}
+      >
+        {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+      </button>
+    </aside>
+  )
 }

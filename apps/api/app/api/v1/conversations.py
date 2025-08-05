@@ -92,3 +92,65 @@ async def delete_conversation(
     except Exception as e:
         logger.error(f"Error deleting conversation: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/generate-title")
+async def generate_title(request: Request):
+    """Generate and save a smart title for a conversation"""
+    try:
+        # Parse request body
+        body = await request.json()
+        conversation_id = body.get("conversation_id")
+        user_id = body.get("user_id")
+        messages = body.get("messages", [])
+        
+        if not conversation_id or not user_id or not messages:
+            raise HTTPException(status_code=400, detail="Missing required fields")
+        
+        # Create prompt for title generation
+        user_msg = messages[0].get("content", "") if messages else ""
+        assistant_msg = messages[1].get("content", "")[:200] if len(messages) > 1 else ""
+        
+        title_prompt = f"""Generate a very short (2-4 words) conversation title based on this exchange:
+User: {user_msg}
+Assistant: {assistant_msg[:200]}...
+
+Return ONLY the title, no quotes, no explanation. Examples:
+- "Python Debugging Help"
+- "Weather Query"
+- "Introduction"
+- "Code Review Request"
+
+Title:"""
+        
+        # Import required modules
+        from app.core.config import settings
+        from app.api.v1.chat import get_provider, ChatMessage
+        
+        # Use DeepSeek for reliable title generation
+        provider = get_provider("deepseek", settings)
+        
+        # Generate title with the model
+        title_messages = [ChatMessage(role="user", content=title_prompt)]
+        response = await provider.complete(
+            messages=title_messages,
+            model="deepseek-chat",
+            temperature=0.5,  # Slightly more creative
+            max_tokens=100  # Give DeepSeek room to think AND output
+        )
+        
+        title = response.content.strip()[:50] if response.content else f"Chat {conversation_id[:8]}"
+        
+        # Save title to Redis conversation metadata
+        redis_client = request.app.state.redis
+        conv_key = f"conv:meta:{user_id}:{conversation_id}"
+        
+        await redis_client.hset(conv_key, "title", title)
+        await redis_client.hset(conv_key, "last_message", messages[0].get("content", ""))
+        
+        logger.info(f"Generated title '{title}' for conversation {conversation_id}")
+        
+        return {"title": title, "success": True}
+        
+    except Exception as e:
+        logger.error(f"Failed to generate title: {e}")
+        raise HTTPException(status_code=500, detail=str(e))

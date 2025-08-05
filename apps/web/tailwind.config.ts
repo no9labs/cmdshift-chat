@@ -18,7 +18,22 @@ const config = {
       },
     },
     extend: {
+      fontFamily: {
+        sans: ['Inter', 'sans-serif'],
+        mono: ['JetBrains Mono', 'monospace'],
+      },
       colors: {
+        // Design system colors
+        'foundation-creme': '#F8F6F2',
+        'cmd-slate-blue': '#3A4D6F',
+        'text-charcoal': '#2C2C2C',
+        'subtle-grey': '#7A7A7A',
+        'key-grey': '#EAE8E2',
+        'success-green': '#3E8953',
+        'warning-amber': '#D97706',
+        'error-red': '#C84A4A',
+        
+        // Keep existing shadcn colors
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
