@@ -1,213 +1,58 @@
-'use client';
-
-import { useState } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { createClient } from '@/lib/supabase/client';
-import { Eye, EyeOff, Loader2 } from 'lucide-react';
+import { LoginForm } from "@/components/login-form"
+import { GalleryVerticalEnd } from "lucide-react"
+import { Safari } from "@/components/magicui/safari"
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const router = useRouter();
-  const supabase = createClient();
-
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setLoading(true);
-
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (error) {
-      setError(error.message);
-      setLoading(false);
-    } else {
-      await new Promise(resolve => setTimeout(resolve, 100));
-      window.location.href = '/chat/new';
-    }
-  };
-
-  const containerStyle = {
-    minHeight: '100vh',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#f5f5f5',
-    padding: '20px'
-  };
-
-  const cardStyle = {
-    backgroundColor: 'white',
-    borderRadius: '8px',
-    boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
-    width: '100%',
-    maxWidth: '400px',
-    padding: '40px'
-  };
-
-  const inputStyle = {
-    width: '100%',
-    padding: '10px',
-    border: '1px solid #ddd',
-    borderRadius: '5px',
-    fontSize: '14px',
-    marginTop: '5px'
-  };
-
-  const buttonStyle = {
-    width: '100%',
-    padding: '12px',
-    backgroundColor: loading ? '#ccc' : '#007bff',
-    color: 'white',
-    border: 'none',
-    borderRadius: '5px',
-    fontSize: '16px',
-    cursor: loading ? 'not-allowed' : 'pointer',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: '8px'
-  };
-
-  const linkStyle = {
-    color: '#007bff',
-    textDecoration: 'none',
-    fontSize: '14px'
-  };
-
-  const errorStyle = {
-    backgroundColor: '#fee',
-    border: '1px solid #fcc',
-    color: '#c33',
-    padding: '10px',
-    borderRadius: '5px',
-    marginBottom: '20px',
-    fontSize: '14px'
-  };
-
   return (
-    <div style={containerStyle}>
-      <div style={cardStyle}>
-        <div style={{ textAlign: 'center', marginBottom: '30px' }}>
-          <h1 style={{ fontSize: '28px', margin: '0 0 10px 0' }}>Welcome Back</h1>
-          <p style={{ color: '#666', margin: 0 }}>Sign in to your CmdShift account</p>
-        </div>
-
-        {error && (
-          <div style={errorStyle}>
-            {error}
-          </div>
-        )}
-
-        <form onSubmit={handleLogin}>
-          <div style={{ marginBottom: '20px' }}>
-            <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', fontWeight: '500' }}>
-              Email
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email"
-              required
-              style={inputStyle}
-            />
-          </div>
-
-          <div style={{ marginBottom: '20px', position: 'relative' }}>
-            <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', fontWeight: '500' }}>
-              Password
-            </label>
-            <input
-              type={showPassword ? 'text' : 'password'}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter your password"
-              required
-              style={inputStyle}
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              style={{
-                position: 'absolute',
-                right: '10px',
-                top: '32px',
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                padding: '5px'
-              }}
-            >
-              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-            </button>
-          </div>
-
-          <div style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <label style={{ display: 'flex', alignItems: 'center', fontSize: '14px' }}>
-              <input
-                type="checkbox"
-                checked={rememberMe}
-                onChange={(e) => setRememberMe(e.target.checked)}
-                style={{ marginRight: '8px' }}
-              />
-              Remember me
-            </label>
-            <Link href="/forgot-password" style={linkStyle}>
-              Forgot password?
-            </Link>
-          </div>
-
-          <button type="submit" disabled={loading} style={buttonStyle}>
-            {loading && <Loader2 size={20} className="animate-spin" />}
-            {loading ? 'Signing in...' : 'Sign In'}
-          </button>
-        </form>
-
-        <div style={{ marginTop: '30px', textAlign: 'center' }}>
-          <p style={{ color: '#666', fontSize: '14px' }}>
-            Don't have an account?{' '}
-            <Link href="/signup" style={linkStyle}>
-              Sign up
-            </Link>
-          </p>
-        </div>
-
-        <div style={{ marginTop: '30px', paddingTop: '30px', borderTop: '1px solid #eee' }}>
-          <div style={{ 
-            backgroundColor: '#f0f7ff', 
-            padding: '15px', 
-            borderRadius: '5px',
-            fontSize: '14px',
-            color: '#0066cc'
-          }}>
-            <strong>Demo Accounts:</strong>
-            <ul style={{ margin: '10px 0 0 20px', paddingLeft: '0' }}>
-              <li>Free: demo@example.com / demo123</li>
-              <li>Pro: demo_pro@example.com / demo123</li>
-            </ul>
+    <div className="min-h-screen w-full flex lg:grid lg:grid-cols-2">
+      <div className="flex-1 flex flex-col bg-[#F8F6F2] dark:bg-gradient-to-br dark:from-slate-950 dark:to-slate-900">
+        {/* Logo in top left corner */}
+        <div className="absolute top-8 left-8 z-10">
+          <div className="flex items-center space-x-2">
+            <div className="bg-gradient-to-br from-[#3A4D6F] to-[#2A3D5F] rounded-lg p-2">
+              <GalleryVerticalEnd className="h-6 w-6 text-white" />
+            </div>
+            <span className="text-xl font-semibold text-[#2C2C2C] dark:text-white">CmdShift</span>
           </div>
         </div>
-
-        <style jsx>{`
-          @keyframes spin {
-            to {
-              transform: rotate(360deg);
-            }
-          }
-          .animate-spin {
-            animation: spin 1s linear infinite;
-          }
-        `}</style>
+        
+        {/* Login form centered */}
+        <div className="flex-1 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+          <LoginForm />
+        </div>
+      </div>
+      <div className="hidden lg:flex items-center justify-center relative bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+        {/* Grid pattern overlay */}
+        <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:30px_30px]" />
+        
+        <div className="relative p-12 max-w-4xl w-full">
+          <Safari
+            url="cmdshift.ai"
+            className="size-full"
+            imageSrc="/cmd-hero-6.svg"
+          />
+          
+          <div className="mt-8 text-center space-y-4">
+            <h2 className="text-2xl font-bold text-white">Browser-Based AI Development</h2>
+            <p className="text-slate-400">Experience the future of coding with CmdShift AI</p>
+            
+            <div className="flex items-center justify-center space-x-8 text-slate-500 pt-4">
+              <div className="flex items-center space-x-2">
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"/>
+                </svg>
+                <span className="text-sm">Team Collaboration</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633zM5.707 6.293a1 1 0 010 1.414L3.414 10l2.293 2.293a1 1 0 11-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0zm8.586 0a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 11-1.414-1.414L16.586 10l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd"/>
+                </svg>
+                <span className="text-sm">AI-Powered Coding</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-  );
+  )
 }

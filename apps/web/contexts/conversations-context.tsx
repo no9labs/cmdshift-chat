@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react'
 
 interface Conversation {
   id: string
@@ -9,9 +9,20 @@ interface Conversation {
   updatedAt: string
 }
 
+interface ConversationsContextType {
+  conversations: Conversation[]
+  isLoading: boolean
+  refreshConversations: () => Promise<void>
+  updateConversationTitle: (id: string, title: string) => void
+  addTemporaryConversation: (id: string) => void
+  addConversation: (conversation: Conversation) => void  // Add this line
+}
+
+const ConversationsContext = createContext<ConversationsContextType | undefined>(undefined)
+
 const USER_ID = '692a4738-5530-4627-8950-04d40d9b7d7e'
 
-export function useConversations() {
+export function ConversationsProvider({ children }: { children: ReactNode }) {
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
@@ -34,13 +45,12 @@ export function useConversations() {
       setConversations(uniqueConversations)
       
     } catch (error) {
-      console.error('[useConversations] Failed to fetch conversations:', error)
+      console.error('[ConversationsContext] Failed to fetch conversations:', error)
     } finally {
       setIsLoading(false)
     }
   }, [])
 
-  // Direct update method that doesn't rely on fetching
   const updateConversationTitle = useCallback((id: string, title: string) => {
     setConversations(prev => {
       const newConvs = [...prev]
@@ -54,7 +64,6 @@ export function useConversations() {
     })
   }, [])
 
-  // Add temporary conversation
   const addTemporaryConversation = useCallback((id: string) => {
     const tempConv: Conversation = {
       id,
@@ -68,6 +77,12 @@ export function useConversations() {
   // Add a new conversation with full control over its properties
   const addConversation = useCallback((conversation: Conversation) => {
     setConversations(prev => {
+      // Check if conversation already exists
+      const exists = prev.some(c => c.id === conversation.id)
+      if (exists) {
+        return prev
+      }
+      
       // Add new conversation to the beginning
       const updated = [conversation, ...prev]
       return updated
@@ -78,12 +93,26 @@ export function useConversations() {
     fetchConversations()
   }, [fetchConversations])
 
-  return { 
-    conversations, 
-    isLoading,
-    refreshConversations: fetchConversations,
-    updateConversationTitle,  // Export the new method
-    addTemporaryConversation,
-    addConversation  // Add this line
+  return (
+    <ConversationsContext.Provider 
+      value={{
+        conversations,
+        isLoading,
+        refreshConversations: fetchConversations,
+        updateConversationTitle,
+        addTemporaryConversation,
+        addConversation  // Add this line
+      }}
+    >
+      {children}
+    </ConversationsContext.Provider>
+  )
+}
+
+export function useConversations() {
+  const context = useContext(ConversationsContext)
+  if (context === undefined) {
+    throw new Error('useConversations must be used within a ConversationsProvider')
   }
+  return context
 }

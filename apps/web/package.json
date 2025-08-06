@@ -32,7 +32,7 @@
     "clsx": "^2.1.1",
     "cobe": "^0.6.4",
     "framer-motion": "^12.23.12",
-    "lucide-react": "^0.534.0",
+    "lucide-react": "^0.536.0",
     "motion": "^12.23.12",
     "nanoid": "^5.1.5",
     "next": "15.4.5",

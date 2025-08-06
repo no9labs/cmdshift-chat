@@ -1,12 +1,13 @@
-import type { Metadata } from "next"
-import { Inter } from "next/font/google"
-import "./globals.css"
+import type { Metadata } from 'next'
+import { Inter } from 'next/font/google'
+import './globals.css'
+import { ThemeToggle } from '@/components/theme-toggle'
 
-const inter = Inter({ subsets: ["latin"] })
+const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: "CmdShift - AI Chat Platform",
-  description: "Democratizing AI access with unlimited usage",
+  title: 'CmdShift Chat',
+  description: 'Unlimited AI chat with multiple models',
 }
 
 export default function RootLayout({
@@ -15,10 +16,10 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      <head />
+    <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
         {children}
+        <ThemeToggle className="fixed top-4 right-4 z-50" />
       </body>
     </html>
   )
