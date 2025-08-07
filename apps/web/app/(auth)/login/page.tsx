@@ -3,6 +3,7 @@
 import { LoginForm } from "@/components/login-form"
 import { Globe } from "@/components/magicui/globe"
 import { DotPattern } from "@/components/magicui/dot-pattern"
+import { Meteors } from "@/components/magicui/meteors"
 import { ThemeToggle } from "@/components/theme-toggle"
 import Image from "next/image"
 import { useEffect, useState } from "react"
@@ -84,7 +85,17 @@ export default function LoginPage() {
         <ThemeToggle />
       </div>
       
-      <div className="flex-1 flex flex-col bg-white dark:bg-gradient-to-br dark:from-zinc-950 dark:to-zinc-900">
+      <div className="flex-1 flex flex-col bg-white dark:bg-gradient-to-br dark:from-zinc-950 dark:to-zinc-900 relative overflow-hidden">
+        {/* Dot pattern background */}
+        <DotPattern 
+          width={20}
+          height={20}
+          cx={1}
+          cy={1}
+          cr={1}
+          className="[mask-image:radial-gradient(600px_circle_at_center,white,transparent)] opacity-50 dark:opacity-30"
+        />
+        
         {/* Logo in top left corner */}
         <div className="absolute top-8 left-8 z-10">
           <div className="flex items-center space-x-3">
@@ -99,20 +110,13 @@ export default function LoginPage() {
         </div>
         
         {/* Login form centered */}
-        <div className="flex-1 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div className="flex-1 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative z-10">
           <LoginForm />
         </div>
       </div>
       <div className="hidden lg:block relative bg-gradient-to-br from-zinc-100 via-white to-zinc-100 dark:from-zinc-900 dark:via-zinc-800 dark:to-zinc-900 overflow-hidden">
-        {/* Dot pattern background */}
-        <DotPattern 
-          width={20}
-          height={20}
-          cx={1}
-          cy={1}
-          cr={1}
-          className="[mask-image:radial-gradient(600px_circle_at_center,white,transparent)] opacity-50 dark:opacity-30"
-        />
+        {/* Meteors background */}
+        <Meteors number={20} />
         
         <div className="relative z-10 h-full">
           {/* Login Logo at the top with padding */}
