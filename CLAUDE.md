@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-CmdShift Chat is a cost-efficient AI chat platform that aggregates Chinese LLM APIs (DeepSeek, Qwen, GLM) to provide 60-70% cost savings compared to traditional platforms. Built as a Turborepo monorepo with a Next.js frontend and FastAPI backend.
+CmdShiftChat is a cost-efficient AI chat platform that aggregates Chinese LLM APIs (DeepSeek, Qwen, GLM) to provide 60-70% cost savings compared to traditional platforms. Built as a Turborepo monorepo with a Next.js frontend and FastAPI backend.
 
 ## Key Mission
 

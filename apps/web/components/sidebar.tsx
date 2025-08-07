@@ -5,6 +5,7 @@ import { useRouter, usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { cn } from "@/lib/utils"
+import { useTheme } from "@/hooks/useTheme"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,6 +16,7 @@ import {
 import { ChevronLeft, ChevronDown, Plus, Settings, LogOut, CreditCard, HelpCircle, User, RefreshCw, MessageSquare } from "lucide-react"
 import { useConversations } from "@/contexts/conversations-context"
 import Link from "next/link"
+import Image from "next/image"
 
 export function Sidebar() {
   const [collapsed, setCollapsed] = useState(false)
@@ -26,6 +28,30 @@ export function Sidebar() {
   const pathname = usePathname()
   const router = useRouter()
   const { conversations, isLoading, refreshConversations, addTemporaryConversation, updateConversationTitle } = useConversations()
+  const { theme } = useTheme()
+  
+  // Determine which logo to use based on theme
+  const [logoSrc, setLogoSrc] = useState("/cmd-logo-no-padding.svg")
+  
+  useEffect(() => {
+    const updateLogo = () => {
+      const root = window.document.documentElement
+      const isDark = root.classList.contains('dark')
+      setLogoSrc(isDark ? "/cmd-logo-no-padding.svg" : "/cmd-logo-inverted.svg")
+    }
+    
+    // Initial update
+    updateLogo()
+    
+    // Create a MutationObserver to watch for class changes
+    const observer = new MutationObserver(updateLogo)
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class']
+    })
+    
+    return () => observer.disconnect()
+  }, [theme])
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -107,7 +133,7 @@ export function Sidebar() {
     <aside
       className={`${
         collapsed ? "w-20" : "w-64"
-      } bg-[#EAE8E2] dark:bg-gray-800 p-4 flex flex-col justify-between transition-all duration-300 size-full relative`}
+      } bg-sidebar p-4 flex flex-col justify-between transition-all duration-300 size-full relative`}
     >
       <div className="flex-1 overflow-hidden flex flex-col">
         {/* Logo and Brand */}
@@ -116,30 +142,20 @@ export function Sidebar() {
             <div className="flex flex-col items-center gap-2">
               <button
                 onClick={handleNewChat}
-                className="bg-white dark:bg-gray-700 rounded-lg p-2 shadow-sm flex-shrink-0 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+                className="flex-shrink-0 hover:opacity-80 transition-opacity"
               >
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="flex-shrink-0"
-                >
-                  <path
-                    d="M9 9V15M15 9V15M9 12H15M17 19H7C4.79086 19 3 17.2091 3 15V9C3 6.79086 4.79086 5 7 5H17C19.2091 5 21 6.79086 21 9V15C21 17.2091 19.2091 19 17 19Z"
-                    stroke="#2C2C2C"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
+                <Image 
+                  src={logoSrc} 
+                  alt="CmdShift Logo" 
+                  width={48} 
+                  height={48}
+                />
               </button>
               <button
                 onClick={() => setCollapsed(!collapsed)}
-                className="p-1 rounded-md hover:bg-white/50 dark:hover:bg-gray-700/50 transition-colors"
+                className="p-1 rounded-md hover:bg-sidebar-accent transition-colors"
               >
-                <ChevronLeft className="size-4 text-[#7A7A7A] dark:text-gray-400 rotate-180" />
+                <ChevronLeft className="size-4 text-muted-foreground rotate-180" />
               </button>
             </div>
           ) : (
@@ -147,36 +163,25 @@ export function Sidebar() {
               <div className="flex items-center gap-3">
                 <button
                   onClick={handleNewChat}
-                  className="flex items-center gap-3 hover:bg-white/50 dark:hover:bg-gray-700/50 rounded-lg p-2 transition-colors"
+                  className="flex items-center gap-3 hover:bg-sidebar-accent rounded-lg p-2 transition-colors"
                 >
-                  <div className="bg-white dark:bg-gray-700 rounded-lg p-2 shadow-sm flex-shrink-0">
-                    <svg
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="flex-shrink-0"
-                    >
-                      <path
-                        d="M9 9V15M15 9V15M9 12H15M17 19H7C4.79086 19 3 17.2091 3 15V9C3 6.79086 4.79086 5 7 5H17C19.2091 5 21 6.79086 21 9V15C21 17.2091 19.2091 19 17 19Z"
-                        stroke="#2C2C2C"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </div>
-                  <h1 className="text-xl font-semibold text-[#2C2C2C] dark:text-white whitespace-nowrap overflow-hidden">
+                  <Image 
+                    src={logoSrc} 
+                    alt="CmdShift Logo" 
+                    width={48} 
+                    height={48}
+                    className="flex-shrink-0"
+                  />
+                  <h1 className="text-xl font-semibold text-sidebar-foreground whitespace-nowrap overflow-hidden">
                     CmdShift
                   </h1>
                 </button>
               </div>
               <button
                 onClick={() => setCollapsed(!collapsed)}
-                className="p-1 rounded-md hover:bg-white/50 dark:hover:bg-gray-700/50 transition-colors"
+                className="p-1 rounded-md hover:bg-sidebar-accent transition-colors"
               >
-                <ChevronLeft className="size-4 text-[#7A7A7A] dark:text-gray-400" />
+                <ChevronLeft className="size-4 text-muted-foreground" />
               </button>
             </div>
           )}
@@ -187,7 +192,7 @@ export function Sidebar() {
           onClick={handleNewChat}
           className={`w-full flex items-center ${
             collapsed ? "justify-center px-2" : "justify-center gap-2 px-4"
-          } bg-[#3A4D6F] hover:bg-[#3A4D6F]/90 transition-all text-white font-medium py-3 rounded-lg shadow-sm mb-3 border-0`}
+          } bg-primary hover:bg-primary/90 transition-all text-primary-foreground font-medium py-3 rounded-lg shadow-sm mb-3 border-0`}
           variant="default"
         >
           <Plus className="size-4 flex-shrink-0" />
@@ -201,7 +206,7 @@ export function Sidebar() {
           }}
           className={`w-full flex items-center ${
             collapsed ? "justify-center px-2" : "justify-center gap-2 px-4"
-          } bg-white/50 hover:bg-white/70 dark:bg-gray-700/50 dark:hover:bg-gray-700/70 transition-all text-[#2C2C2C] dark:text-white font-medium py-2 rounded-lg shadow-sm mb-6 border border-[#7A7A7A]/20 dark:border-gray-600/20`}
+          } bg-sidebar-accent hover:bg-sidebar-accent/70 transition-all text-sidebar-accent-foreground font-medium py-2 rounded-lg shadow-sm mb-6 border border-sidebar-border`}
           variant="outline"
         >
           <RefreshCw className="size-4 flex-shrink-0" />
@@ -213,7 +218,7 @@ export function Sidebar() {
           <>
             <button
               onClick={() => setIsRecentCollapsed(!isRecentCollapsed)}
-              className="flex items-center justify-between w-full text-sm font-medium text-[#7A7A7A] dark:text-gray-400 mb-3 px-2 hover:text-[#5A5A5A] dark:hover:text-gray-300 transition-colors"
+              className="flex items-center justify-between w-full text-sm font-medium text-muted-foreground mb-3 px-2 hover:text-sidebar-foreground transition-colors"
             >
               <span>Recent</span>
               <ChevronDown 
@@ -230,9 +235,9 @@ export function Sidebar() {
                         href={`/chat/${conversation.id}`}
                         className={cn(
                           "flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors",
-                          "hover:bg-white/50 hover:text-[#2C2C2C] dark:hover:bg-gray-700/50 dark:hover:text-white",
+                          "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
                           "group relative",
-                          pathname === `/chat/${conversation.id}` && "bg-white dark:bg-gray-700 text-[#2C2C2C] dark:text-white shadow-sm"
+                          pathname === `/chat/${conversation.id}` && "bg-sidebar-accent text-sidebar-accent-foreground shadow-sm"
                         )}
                       >
                         <MessageSquare className="size-4 flex-shrink-0" aria-hidden="true" />
@@ -250,66 +255,66 @@ export function Sidebar() {
       </div>
 
       {/* User Profile Section */}
-      <div className="border-t border-[#7A7A7A]/20 dark:border-gray-600/20 pt-4">
+      <div className="border-t border-sidebar-border pt-4">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
-              className={`flex items-center w-full hover:bg-white/50 dark:hover:bg-gray-700/50 rounded-lg p-3 transition-colors focus-visible:outline-none ${
+              className={`flex items-center w-full hover:bg-sidebar-accent rounded-lg p-3 transition-colors focus-visible:outline-none ${
                 collapsed ? "justify-center" : "gap-3"
               }`}
             >
               <Avatar className="size-10 flex-shrink-0">
                 <AvatarImage src={`https://placehold.co/40x40/3A4D6F/FFFFFF?text=${initials}`} />
-                <AvatarFallback className="bg-[#3A4D6F] text-white font-medium">{initials}</AvatarFallback>
+                <AvatarFallback className="bg-primary text-primary-foreground font-medium">{initials}</AvatarFallback>
               </Avatar>
               {!collapsed && (
                 <div className="text-left overflow-hidden">
-                  <p className="font-medium text-[#2C2C2C] dark:text-white text-sm truncate">{displayName}</p>
-                  <p className="text-xs text-[#7A7A7A] dark:text-gray-400 truncate">{subscriptionTier}</p>
+                  <p className="font-medium text-sidebar-foreground text-sm truncate">{displayName}</p>
+                  <p className="text-xs text-muted-foreground truncate">{subscriptionTier}</p>
                 </div>
               )}
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent
             align="end"
-            className="w-56 bg-white dark:bg-gray-800 border-[#EAE8E2] dark:border-gray-700"
+            className="w-56 bg-popover border-border"
           >
             <div className="text-xs text-muted-foreground pt-1 px-2 pb-2 overflow-ellipsis truncate">
               {userEmail}
             </div>
-            <DropdownMenuItem asChild className="focus:bg-gray-100 dark:focus:bg-gray-700 cursor-pointer">
-              <Link href="/profile" className="flex items-center gap-2 text-[#2C2C2C] dark:text-white">
+            <DropdownMenuItem asChild className="focus:bg-accent focus:text-accent-foreground cursor-pointer">
+              <Link href="/profile" className="flex items-center gap-2 text-popover-foreground">
                 <User className="size-4" />
                 Profile
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem asChild className="focus:bg-gray-100 dark:focus:bg-gray-700 cursor-pointer">
-              <Link href="/pricing" className="flex items-center gap-2 text-[#2C2C2C] dark:text-white">
+            <DropdownMenuItem asChild className="focus:bg-accent focus:text-accent-foreground cursor-pointer">
+              <Link href="/pricing" className="flex items-center gap-2 text-popover-foreground">
                 <CreditCard className="size-4" />
                 Upgrade Plan
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem asChild className="focus:bg-gray-100 dark:focus:bg-gray-700 cursor-pointer">
-              <Link href="/settings" className="flex items-center gap-2 text-[#2C2C2C] dark:text-white">
+            <DropdownMenuItem asChild className="focus:bg-accent focus:text-accent-foreground cursor-pointer">
+              <Link href="/settings" className="flex items-center gap-2 text-popover-foreground">
                 <Settings className="size-4" />
                 Settings
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem asChild className="focus:bg-gray-100 dark:focus:bg-gray-700 cursor-pointer">
-              <Link href="/usage" className="flex items-center gap-2 text-[#2C2C2C] dark:text-white">
+            <DropdownMenuItem asChild className="focus:bg-accent focus:text-accent-foreground cursor-pointer">
+              <Link href="/usage" className="flex items-center gap-2 text-popover-foreground">
                 <User className="size-4" />
                 Usage
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuSeparator className="bg-[#EAE8E2] dark:bg-gray-700" />
-            <DropdownMenuItem className="flex items-center gap-2 text-[#2C2C2C] dark:text-white focus:bg-gray-100 dark:focus:bg-gray-700 cursor-pointer">
+            <DropdownMenuSeparator className="bg-border" />
+            <DropdownMenuItem className="flex items-center gap-2 text-popover-foreground focus:bg-accent focus:text-accent-foreground cursor-pointer">
               <HelpCircle className="size-4" />
               Help
             </DropdownMenuItem>
-            <DropdownMenuSeparator className="bg-[#EAE8E2] dark:bg-gray-700" />
+            <DropdownMenuSeparator className="bg-border" />
             <DropdownMenuItem
               onClick={handleSignOut}
-              className="flex items-center gap-2 text-[#C84A4A] focus:bg-red-50 dark:focus:bg-red-900/50 focus:text-red-600 cursor-pointer"
+              className="flex items-center gap-2 text-destructive focus:bg-destructive/10 focus:text-destructive cursor-pointer"
             >
               <LogOut className="size-4" />
               Sign Out

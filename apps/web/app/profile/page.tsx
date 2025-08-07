@@ -5,7 +5,7 @@ import { ConversationsProvider } from "@/contexts/conversations-context"
 export default function ProfilePage() {
   return (
     <ConversationsProvider>
-      <div className="flex h-screen bg-[#F8F6F2] dark:bg-gray-900">
+      <div className="flex h-screen bg-white dark:bg-gray-900">
         <Sidebar />
         <main className="flex-1 flex flex-col overflow-hidden">
           <ProfileContent />

@@ -2,10 +2,20 @@
 
 import type React from "react"
 import { useState, useRef, useEffect } from "react"
+import { ShineBorder } from "@/components/magicui/shine-border"
+import { Meteors } from "@/components/magicui/meteors"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Send, Bot, Plus, Settings, Check, ChevronsUpDown } from "lucide-react"
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
+import { Send, Bot, Plus, Settings, Check, ChevronsUpDown, Home } from "lucide-react"
 
 interface Message {
   id: string
@@ -235,35 +245,60 @@ export function ChatInterface({
   if (isNewChat) {
     // Centered layout for new chat
     return (
-      <div className="flex flex-col h-full bg-[#F8F6F2] dark:bg-gray-900">
-        {/* Chat Header */}
-        <div className="p-6 bg-[#F8F6F2] dark:bg-gray-900 flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-[#2C2C2C] dark:text-white">New Chat</h2>
-        </div>
+      <div className="flex flex-col h-full bg-sidebar relative">
+        {/* Full-height card with meteors */}
+        <div className="absolute inset-6 bg-white dark:bg-black rounded-3xl border border-border/50 shadow-2xl overflow-hidden">
+          <Meteors number={20} />
+          
+          {/* Content inside the card */}
+          <div className="relative z-10 flex flex-col h-full">
+            {/* Chat Header */}
+            <div className="p-8">
+              <Breadcrumb>
+                <BreadcrumbList>
+                  <BreadcrumbItem>
+                    <BreadcrumbLink href="/" className="flex items-center gap-1">
+                      <Home className="h-4 w-4" />
+                      Home
+                    </BreadcrumbLink>
+                  </BreadcrumbItem>
+                  <BreadcrumbSeparator />
+                  <BreadcrumbItem>
+                    <BreadcrumbPage>New Chat</BreadcrumbPage>
+                  </BreadcrumbItem>
+                </BreadcrumbList>
+              </Breadcrumb>
+            </div>
 
-        {/* Centered Content */}
-        <div className="flex-1 flex flex-col items-center justify-center p-6">
-          <div className="max-w-2xl w-full space-y-8">
+            {/* Centered Content */}
+            <div className="flex-1 flex flex-col items-center justify-center p-6">
+            <div className="max-w-2xl w-full space-y-8">
             {/* Quote with Logo */}
             <div className="text-center space-y-4">
               <div className="flex items-center justify-center gap-3 mb-6">
-                <div className="bg-[#3A4D6F] rounded-lg p-2 shadow-sm">
+                <div className="bg-primary rounded-lg p-2 shadow-sm">
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path
                       d="M9 9V15M15 9V15M9 12H15M17 19H7C4.79086 19 3 17.2091 3 15V9C3 6.79086 4.79086 5 7 5H17C19.2091 5 21 6.79086 21 9V15C21 17.2091 19.2091 19 17 19Z"
-                      stroke="white"
+                      stroke="currentColor"
                       strokeWidth="2"
                       strokeLinecap="round"
                       strokeLinejoin="round"
                     />
                   </svg>
                 </div>
-                <h1 className="text-2xl font-medium text-[#2C2C2C] dark:text-white">What's on your mind today?</h1>
+                <h1 className="text-2xl font-medium text-foreground">What's on your mind today?</h1>
               </div>
             </div>
 
             {/* Centered Input */}
-            <div className="bg-white dark:bg-gray-800 rounded-2xl p-1 shadow-sm border border-[#EAE8E2] dark:border-gray-700 focus-within:border-[#B8C5D6] dark:focus-within:border-[#3A4D6F] focus-within:ring-1 focus-within:ring-[#B8C5D6] dark:focus-within:ring-[#3A4D6F] focus-within:shadow-none transition-colors">
+            <div className="bg-card rounded-2xl p-1 shadow-sm border border-border focus-within:border-ring focus-within:ring-1 focus-within:ring-ring focus-within:shadow-none transition-colors relative">
+              <ShineBorder 
+                borderWidth={3}
+                duration={8}
+                shineColor={["#18ccfc", "#ff00ff", "#ffff00"]}
+                className="opacity-100"
+              />
               <div className="relative">
                 <textarea
                   ref={inputRef as React.RefObject<HTMLTextAreaElement>}
@@ -271,7 +306,7 @@ export function ChatInterface({
                   onChange={(e) => setInputValue(e.target.value)}
                   onKeyPress={handleKeyPress as any}
                   placeholder="How can I help you today?"
-                  className="w-full bg-transparent border-none resize-none p-2 pl-3 focus:ring-0 focus:outline-none text-base text-[#2C2C2C] dark:text-white placeholder:text-[#7A7A7A] dark:placeholder:text-gray-400 shadow-none focus:shadow-none"
+                  className="w-full bg-transparent border-none resize-none p-2 pl-3 focus:ring-0 focus:outline-none text-base text-card-foreground placeholder:text-muted-foreground shadow-none focus:shadow-none"
                   rows={1}
                   disabled={isStreaming}
                 />
@@ -280,14 +315,14 @@ export function ChatInterface({
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="text-[#7A7A7A] dark:text-gray-400 hover:bg-[#EAE8E2] dark:hover:bg-gray-700 hover:text-[#2C2C2C] dark:hover:text-white rounded-lg"
+                  className="text-muted-foreground hover:bg-accent hover:text-accent-foreground rounded-lg"
                 >
                   <Plus className="size-5" />
                 </Button>
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="text-[#7A7A7A] dark:text-gray-400 hover:bg-[#EAE8E2] dark:hover:bg-gray-700 hover:text-[#2C2C2C] dark:hover:text-white rounded-lg"
+                  className="text-muted-foreground hover:bg-accent hover:text-accent-foreground rounded-lg"
                 >
                   <Settings className="size-5" />
                 </Button>
@@ -297,13 +332,13 @@ export function ChatInterface({
                   <Button
                     variant="outline"
                     onClick={() => setModelOpen(!modelOpen)}
-                    className="w-[120px] justify-between border-[#EAE8E2] dark:border-gray-600 text-[#2C2C2C] dark:text-white hover:bg-[#EAE8E2] dark:hover:bg-gray-700 bg-transparent text-sm shadow-none"
+                    className="w-[120px] justify-between border-border text-foreground hover:bg-accent hover:text-accent-foreground bg-transparent text-sm shadow-none"
                   >
                     {selectedModel}
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                   {modelOpen && (
-                    <div className="absolute top-full mt-1 w-[120px] bg-white dark:bg-gray-800 border border-[#EAE8E2] dark:border-gray-700 rounded-md overflow-hidden z-50">
+                    <div className="absolute top-full mt-1 w-[120px] bg-popover border border-border rounded-md overflow-hidden z-50">
                       {models.map((model) => (
                         <button
                           key={model.value}
@@ -311,7 +346,7 @@ export function ChatInterface({
                             setSelectedModel(model.label)
                             setModelOpen(false)
                           }}
-                          className="w-full px-3 py-2 text-left text-sm text-[#2C2C2C] dark:text-white hover:bg-[#EAE8E2] dark:hover:bg-gray-700 flex items-center gap-2"
+                          className="w-full px-3 py-2 text-left text-sm text-popover-foreground hover:bg-accent hover:text-accent-foreground flex items-center gap-2"
                         >
                           <Check className={`h-4 w-4 ${selectedModel === model.label ? "opacity-100" : "opacity-0"}`} />
                           {model.label}
@@ -323,12 +358,14 @@ export function ChatInterface({
                 <Button
                   onClick={handleSendMessage}
                   disabled={!inputValue.trim() || isStreaming}
-                  className="bg-[#3A4D6F] hover:bg-[#3A4D6F]/90 text-white size-10 p-0 rounded-lg shadow-sm"
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground size-10 p-0 rounded-lg shadow-sm"
                 >
                   <Send className="size-5" />
                 </Button>
               </div>
             </div>
+            </div>
+          </div>
           </div>
         </div>
       </div>
@@ -337,119 +374,146 @@ export function ChatInterface({
 
   // Normal chat layout with messages
   return (
-    <div className="flex flex-col h-full bg-[#F8F6F2] dark:bg-gray-900">
-      {/* Chat Header */}
-      <div className="p-6 bg-[#F8F6F2] dark:bg-gray-900 flex items-center justify-between">
-        <h2 className="text-xl font-semibold text-[#2C2C2C] dark:text-white">
-          {messages.length > 1 ? "Getting started with React" : "New Chat"}
-        </h2>
-      </div>
-
-      {/* Messages Area */}
-      <ScrollArea ref={scrollAreaRef} className="flex-1 p-6 overflow-y-auto">
-        <div className="space-y-6 max-w-4xl mx-auto">
-          {messages.map((message, index) => (
-            <div key={`msg-${message.id}-${index}`} className={`flex gap-4 ${message.role === "user" ? "justify-end" : "justify-start"}`}>
-              {message.role === "assistant" && (
-                <Avatar className="size-10 mt-1 flex-shrink-0">
-                  <AvatarFallback className="bg-[#3A4D6F] text-white">
-                    <Bot className="size-5" />
-                  </AvatarFallback>
-                </Avatar>
-              )}
-
-              <div className={`max-w-[70%] ${message.role === "user" ? "order-first" : ""}`}>
-                <div
-                  className={`rounded-2xl px-4 py-3 ${
-                    message.role === "user"
-                      ? "bg-[#3A4D6F] text-white shadow-sm"
-                      : "bg-white dark:bg-gray-800 text-[#2C2C2C] dark:text-white shadow-sm border border-[#EAE8E2] dark:border-gray-700"
-                  }`}
-                >
-                  <p className="text-base leading-relaxed">{message.content}</p>
-                </div>
-                <p className="text-xs text-[#7A7A7A] dark:text-gray-400 mt-2 px-2">{message.timestamp ? formatTime(message.timestamp) : ''}</p>
-              </div>
-
-              {message.role === "user" && (
-                <Avatar className="size-10 mt-1 flex-shrink-0">
-                  <AvatarFallback className="bg-[#3A4D6F] text-white font-medium">JD</AvatarFallback>
-                </Avatar>
-              )}
-            </div>
-          ))}
-
-        </div>
-      </ScrollArea>
-
-      {/* Input Area */}
-      <div className="p-6 bg-[#F8F6F2] dark:bg-gray-900">
-        <div className="bg-white dark:bg-gray-800 rounded-2xl p-1 max-w-3xl mx-auto shadow-sm border border-[#EAE8E2] dark:border-gray-700 focus-within:border-[#B8C5D6] dark:focus-within:border-[#3A4D6F] focus-within:ring-1 focus-within:ring-[#B8C5D6] dark:focus-within:ring-[#3A4D6F] focus-within:shadow-none transition-colors">
-          <div className="relative">
-            <textarea
-              ref={inputRef as React.RefObject<HTMLTextAreaElement>}
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              onKeyPress={handleKeyPress as any}
-              placeholder="Reply to CmdShift..."
-              className="w-full bg-transparent border-none resize-none p-2 pl-3 focus:ring-0 focus:outline-none text-base text-[#2C2C2C] dark:text-white placeholder:text-[#7A7A7A] dark:placeholder:text-gray-400 shadow-none focus:shadow-none"
-              rows={1}
-              disabled={isStreaming}
-            />
+    <div className="flex flex-col h-full bg-sidebar relative">
+      {/* Full-height card with meteors */}
+      <div className="absolute inset-6 bg-white dark:bg-black rounded-3xl border border-border/50 shadow-2xl overflow-hidden">
+        <Meteors number={20} />
+        
+        {/* Content inside the card */}
+        <div className="relative z-10 flex flex-col h-full">
+          {/* Chat Header */}
+          <div className="p-8">
+            <Breadcrumb>
+              <BreadcrumbList>
+                <BreadcrumbItem>
+                  <BreadcrumbLink href="/" className="flex items-center gap-1">
+                    <Home className="h-4 w-4" />
+                    Home
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbPage>
+                    {messages.length > 1 ? "Getting started with React" : "New Chat"}
+                  </BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
           </div>
-          <div className="flex items-center gap-2 mt-1 p-1">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-[#7A7A7A] dark:text-gray-400 hover:bg-[#EAE8E2] dark:hover:bg-gray-700 hover:text-[#2C2C2C] dark:hover:text-white rounded-lg"
-            >
-              <Plus className="size-5" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-[#7A7A7A] dark:text-gray-400 hover:bg-[#EAE8E2] dark:hover:bg-gray-700 hover:text-[#2C2C2C] dark:hover:text-white rounded-lg"
-            >
-              <Settings className="size-5" />
-            </Button>
-            <div className="flex-1"></div>
-            {/* Model Selector */}
-            <div className="relative">
-              <Button
-                variant="outline"
-                onClick={() => setModelOpen(!modelOpen)}
-                className="w-[120px] justify-between border-[#EAE8E2] dark:border-gray-600 text-[#2C2C2C] dark:text-white hover:bg-[#EAE8E2] dark:hover:bg-gray-700 bg-transparent text-sm shadow-none"
-              >
-                {selectedModel}
-                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-              </Button>
-              {modelOpen && (
-                <div
-                  className={`absolute ${messages.length === 0 ? "top-full mt-1" : "bottom-full mb-1"} w-[120px] bg-white dark:bg-gray-800 border border-[#EAE8E2] dark:border-gray-700 rounded-md overflow-hidden z-50`}
-                >
-                  {models.map((model) => (
-                    <button
-                      key={model.value}
-                      onClick={() => {
-                        setSelectedModel(model.label)
-                        setModelOpen(false)
-                      }}
-                      className="w-full px-3 py-2 text-left text-sm text-[#2C2C2C] dark:text-white hover:bg-[#EAE8E2] dark:hover:bg-gray-700 flex items-center gap-2"
+
+          {/* Messages Area */}
+          <ScrollArea ref={scrollAreaRef} className="flex-1 px-8 overflow-y-auto">
+            <div className="space-y-6 max-w-4xl mx-auto">
+              {messages.map((message, index) => (
+                <div key={`msg-${message.id}-${index}`} className={`flex gap-4 ${message.role === "user" ? "justify-end" : "justify-start"}`}>
+                  {message.role === "assistant" && (
+                    <Avatar className="size-10 mt-1 flex-shrink-0">
+                      <AvatarFallback className="bg-primary text-primary-foreground">
+                        <Bot className="size-5" />
+                      </AvatarFallback>
+                    </Avatar>
+                  )}
+
+                  <div className={`max-w-[70%] ${message.role === "user" ? "order-first" : ""}`}>
+                    <div
+                      className={`rounded-2xl px-4 py-3 ${
+                        message.role === "user"
+                          ? "bg-primary text-primary-foreground shadow-sm"
+                          : "bg-card text-card-foreground shadow-sm border border-border"
+                      }`}
                     >
-                      <Check className={`h-4 w-4 ${selectedModel === model.label ? "opacity-100" : "opacity-0"}`} />
-                      {model.label}
-                    </button>
-                  ))}
+                      <p className="text-base leading-relaxed">{message.content}</p>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-2 px-2">{message.timestamp ? formatTime(message.timestamp) : ''}</p>
+                  </div>
+
+                  {message.role === "user" && (
+                    <Avatar className="size-10 mt-1 flex-shrink-0">
+                      <AvatarFallback className="bg-primary text-primary-foreground font-medium">JD</AvatarFallback>
+                    </Avatar>
+                  )}
                 </div>
-              )}
+              ))}
+
             </div>
-            <Button
-              onClick={handleSendMessage}
-              disabled={!inputValue.trim() || isStreaming}
-              className="bg-[#3A4D6F] hover:bg-[#3A4D6F]/90 text-white size-10 p-0 rounded-lg shadow-sm"
-            >
-              <Send className="size-5" />
-            </Button>
+          </ScrollArea>
+
+          {/* Input Area */}
+          <div className="p-8 bg-transparent">
+            <div className="bg-card rounded-2xl p-1 max-w-3xl mx-auto shadow-sm border border-border focus-within:border-ring focus-within:ring-1 focus-within:ring-ring focus-within:shadow-none transition-colors relative">
+            <ShineBorder 
+              borderWidth={3}
+              duration={8}
+              shineColor={["#18ccfc", "#ff00ff", "#ffff00"]}
+              className="opacity-100"
+            />
+            <div className="relative">
+              <textarea
+                ref={inputRef as React.RefObject<HTMLTextAreaElement>}
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                onKeyPress={handleKeyPress as any}
+                placeholder="Reply to CmdShift..."
+                className="w-full bg-transparent border-none resize-none p-2 pl-3 focus:ring-0 focus:outline-none text-base text-card-foreground placeholder:text-muted-foreground shadow-none focus:shadow-none"
+                rows={1}
+                disabled={isStreaming}
+              />
+            </div>
+            <div className="flex items-center gap-2 mt-1 p-1">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-muted-foreground hover:bg-accent hover:text-accent-foreground rounded-lg"
+              >
+                <Plus className="size-5" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-muted-foreground hover:bg-accent hover:text-accent-foreground rounded-lg"
+              >
+                <Settings className="size-5" />
+              </Button>
+              <div className="flex-1"></div>
+              {/* Model Selector */}
+              <div className="relative">
+                <Button
+                  variant="outline"
+                  onClick={() => setModelOpen(!modelOpen)}
+                  className="w-[120px] justify-between border-border text-foreground hover:bg-accent hover:text-accent-foreground bg-transparent text-sm shadow-none"
+                >
+                  {selectedModel}
+                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+                {modelOpen && (
+                  <div
+                    className={`absolute ${messages.length === 0 ? "top-full mt-1" : "bottom-full mb-1"} w-[120px] bg-popover border border-border rounded-md overflow-hidden z-50`}
+                  >
+                    {models.map((model) => (
+                      <button
+                        key={model.value}
+                        onClick={() => {
+                          setSelectedModel(model.label)
+                          setModelOpen(false)
+                        }}
+                        className="w-full px-3 py-2 text-left text-sm text-popover-foreground hover:bg-accent hover:text-accent-foreground flex items-center gap-2"
+                      >
+                        <Check className={`h-4 w-4 ${selectedModel === model.label ? "opacity-100" : "opacity-0"}`} />
+                        {model.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <Button
+                onClick={handleSendMessage}
+                disabled={!inputValue.trim() || isStreaming}
+                className="bg-primary hover:bg-primary/90 text-primary-foreground size-10 p-0 rounded-lg shadow-sm"
+              >
+                <Send className="size-5" />
+              </Button>
+            </div>
+          </div>
           </div>
         </div>
       </div>

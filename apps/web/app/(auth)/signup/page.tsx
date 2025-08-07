@@ -1,18 +1,94 @@
+"use client"
+
 import { SignupForm } from "@/components/signup-form"
-import { GalleryVerticalEnd } from "lucide-react"
-import { Safari } from "@/components/magicui/safari"
+import { Globe } from "@/components/magicui/globe"
+import { DotPattern } from "@/components/magicui/dot-pattern"
+import Image from "next/image"
+import { useEffect, useState } from "react"
+import { useTheme } from "@/hooks/useTheme"
 
 export default function SignupPage() {
+  const { theme } = useTheme()
+  // Initialize with the correct theme from the start
+  const [logoSrc, setLogoSrc] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return document.documentElement.classList.contains('dark') 
+        ? "/cmd-logo-no-padding.svg" 
+        : "/cmd-logo-inverted.svg"
+    }
+    return "/cmd-logo-no-padding.svg"
+  })
+  const [loginLogoSrc, setLoginLogoSrc] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return document.documentElement.classList.contains('dark')
+        ? "/login-logo-dark.svg"
+        : "/login-logo-light.svg"
+    }
+    return "/login-logo-dark.svg"
+  })
+  const [headlineIndex, setHeadlineIndex] = useState(0)
+  
+  const headlines = [
+    {
+      main: "The AI Operating System",
+      sub: "Where conversations never end and context never dies"
+    },
+    {
+      main: "Your Persistent AI Workspace",
+      sub: "The first AI that truly remembers everything"
+    },
+    {
+      main: "The Infinite Intelligence Platform",
+      sub: "Command your AI empire"
+    },
+    {
+      main: "AI That Never Sleeps",
+      sub: "Where conversations never end and context never dies"
+    }
+  ]
+  
+  useEffect(() => {
+    const updateLogo = () => {
+      const root = window.document.documentElement
+      const isDark = root.classList.contains('dark')
+      setLogoSrc(isDark ? "/cmd-logo-no-padding.svg" : "/cmd-logo-inverted.svg")
+      setLoginLogoSrc(isDark ? "/login-logo-dark.svg" : "/login-logo-light.svg")
+    }
+    
+    // Initial update
+    updateLogo()
+    
+    // Create a MutationObserver to watch for class changes
+    const observer = new MutationObserver(updateLogo)
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class']
+    })
+    
+    return () => observer.disconnect()
+  }, [theme])
+  
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setHeadlineIndex((prev) => (prev + 1) % headlines.length)
+    }, 2000)
+    
+    return () => clearInterval(interval)
+  }, [headlines.length])
+  
   return (
     <div className="min-h-screen w-full flex lg:grid lg:grid-cols-2">
-      <div className="flex-1 flex flex-col bg-[#F8F6F2] dark:bg-gradient-to-br dark:from-slate-950 dark:to-slate-900">
+      <div className="flex-1 flex flex-col bg-white dark:bg-gradient-to-br dark:from-zinc-950 dark:to-zinc-900">
         {/* Logo in top left corner */}
         <div className="absolute top-8 left-8 z-10">
-          <div className="flex items-center space-x-2">
-            <div className="bg-gradient-to-br from-[#3A4D6F] to-[#2A3D5F] rounded-lg p-2">
-              <GalleryVerticalEnd className="h-6 w-6 text-white" />
-            </div>
-            <span className="text-xl font-semibold text-[#2C2C2C] dark:text-white">CmdShift</span>
+          <div className="flex items-center space-x-3">
+            <Image 
+              src={logoSrc} 
+              alt="CmdShift Logo" 
+              width={56} 
+              height={56}
+            />
+            <span className="text-xl font-semibold text-zinc-900 dark:text-zinc-50">CmdShift</span>
           </div>
         </div>
         
@@ -21,34 +97,31 @@ export default function SignupPage() {
           <SignupForm />
         </div>
       </div>
-      <div className="hidden lg:flex items-center justify-center relative bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-        {/* Grid pattern overlay */}
-        <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:30px_30px]" />
+      <div className="hidden lg:block relative bg-gradient-to-br from-zinc-100 via-white to-zinc-100 dark:from-zinc-900 dark:via-zinc-800 dark:to-zinc-900 overflow-hidden">
+        {/* Dot pattern background */}
+        <DotPattern 
+          width={20}
+          height={20}
+          cx={1}
+          cy={1}
+          cr={1}
+          className="[mask-image:radial-gradient(600px_circle_at_center,white,transparent)] opacity-50 dark:opacity-30"
+        />
         
-        <div className="relative p-12 max-w-4xl w-full">
-          <Safari
-            url="cmdshift.ai"
-            className="size-full"
-            imageSrc="/cmd-hero-6.svg"
-          />
+        <div className="relative z-10 h-full">
+          {/* Login Logo at the top with padding */}
+          <div className="absolute top-24 left-1/2 transform -translate-x-1/2 w-[900px]">
+            <img 
+              src={loginLogoSrc} 
+              alt="CmdShift" 
+              className="w-full h-auto"
+            />
+          </div>
           
-          <div className="mt-8 text-center space-y-4">
-            <h2 className="text-2xl font-bold text-white">Join the AI Revolution</h2>
-            <p className="text-slate-400">Start building amazing applications with CmdShift AI</p>
-            
-            <div className="flex items-center justify-center space-x-8 text-slate-500 pt-4">
-              <div className="flex items-center space-x-2">
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
-                </svg>
-                <span className="text-sm">Growing Community</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633zM5.707 6.293a1 1 0 010 1.414L3.414 10l2.293 2.293a1 1 0 11-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0zm8.586 0a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 11-1.414-1.414L16.586 10l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd"/>
-                </svg>
-                <span className="text-sm">Advanced AI Models</span>
-              </div>
+          {/* Globe Component - positioned at bottom */}
+          <div className="absolute bottom-0 left-0 right-0 h-[600px]">
+            <div className="relative w-full h-full">
+              <Globe className="!max-w-none !w-full" />
             </div>
           </div>
         </div>

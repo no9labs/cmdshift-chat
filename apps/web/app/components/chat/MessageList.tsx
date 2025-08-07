@@ -41,7 +41,7 @@ export function MessageList({ messages, className }: MessageListProps) {
               "relative rounded-lg transition-all duration-300",
               message.role === 'user' 
                 ? "bg-white max-w-[80%] border border-[#EAE8E2]" 
-                : "bg-[#F8F6F2] max-w-[80%] border border-[#EAE8E2]",
+                : "bg-white max-w-[80%] border border-[#EAE8E2]",
               "shadow-sm hover:shadow-md"
             )}>
               <div className="px-5 py-3">

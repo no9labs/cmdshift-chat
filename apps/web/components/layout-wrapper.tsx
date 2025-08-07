@@ -17,7 +17,7 @@ export function LayoutWrapper({ children, user, initialConversations }: LayoutWr
                      pathname === '/usage'
 
   return (
-    <div className="flex h-screen bg-[#F8F6F2]">
+    <div className="flex h-screen bg-white">
       {/* Conditionally render sidebar on specific pages */}
       {showSidebar && (
         <Sidebar user={user} initialConversations={initialConversations} />

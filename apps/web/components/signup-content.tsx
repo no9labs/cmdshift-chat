@@ -240,10 +240,10 @@ export function SignupContent() {
       <div className="absolute top-4 right-4">
         <ThemeToggle />
       </div>
-      <Card className="w-full max-w-md bg-white dark:bg-gray-800 border-[#EAE8E2] dark:border-gray-700 shadow-lg hover:border-[#3A4D6F]/20 dark:hover:border-[#3A4D6F]/30 transition-colors duration-200">
+      <Card className="w-full max-w-md bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 shadow-lg hover:border-[#3A4D6F]/20 dark:hover:border-[#3A4D6F]/30 transition-colors duration-200">
         <CardHeader className="text-center pb-6">
           <div className="flex justify-center mb-6">
-            <div className="bg-[#3A4D6F] rounded-xl p-3 shadow-sm">
+            <div className="bg-zinc-900 rounded-xl p-3 shadow-sm">
               <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path
                   d="M9 9V15M15 9V15M9 12H15M17 19H7C4.79086 19 3 17.2091 3 15V9C3 6.79086 4.79086 5 7 5H17C19.2091 5 21 6.79086 21 9V15C21 17.2091 19.2091 19 17 19Z"
@@ -256,10 +256,10 @@ export function SignupContent() {
             </div>
           </div>
 
-          <CardTitle className="text-2xl font-semibold text-[#2C2C2C] dark:text-white mb-2">
+          <CardTitle className="text-2xl font-semibold text-zinc-900 dark:text-white mb-2">
             Create your account
           </CardTitle>
-          <CardDescription className="text-[#7A7A7A] dark:text-gray-400">
+          <CardDescription className="text-zinc-500 dark:text-zinc-400">
             Join CmdShift and start your AI-powered conversations
           </CardDescription>
         </CardHeader>
@@ -288,25 +288,25 @@ export function SignupContent() {
             {/* Name Fields - 2 Column Grid */}
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-2">
-                <Label htmlFor="firstName" className="text-sm font-medium text-[#2C2C2C] dark:text-white">
+                <Label htmlFor="firstName" className="text-sm font-medium text-zinc-900 dark:text-white">
                   First name
                 </Label>
                 <div className="relative">
-                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 size-4 text-[#7A7A7A] dark:text-gray-400" />
+                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 size-4 text-zinc-500 dark:text-zinc-400" />
                   <Input
                     id="firstName"
                     type="text"
                     placeholder="John"
                     value={formData.firstName}
                     onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                    className="pl-10 border-[#EAE8E2] dark:border-gray-600 focus:border-[#3A4D6F] focus:ring-1 focus:ring-[#3A4D6F] bg-white dark:bg-gray-700 text-[#2C2C2C] dark:text-white shadow-none focus:shadow-none"
+                    className="pl-10 border-zinc-200 dark:border-zinc-600 focus:border-[#3A4D6F] focus:ring-1 focus:ring-[#3A4D6F] bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-none focus:shadow-none"
                     required
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="lastName" className="text-sm font-medium text-[#2C2C2C] dark:text-white">
+                <Label htmlFor="lastName" className="text-sm font-medium text-zinc-900 dark:text-white">
                   Last name
                 </Label>
                 <Input
@@ -315,7 +315,7 @@ export function SignupContent() {
                   placeholder="Doe"
                   value={formData.lastName}
                   onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                  className="border-[#EAE8E2] dark:border-gray-600 focus:border-[#3A4D6F] focus:ring-1 focus:ring-[#3A4D6F] bg-white dark:bg-gray-700 text-[#2C2C2C] dark:text-white shadow-none focus:shadow-none"
+                  className="border-zinc-200 dark:border-zinc-600 focus:border-[#3A4D6F] focus:ring-1 focus:ring-[#3A4D6F] bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-none focus:shadow-none"
                   required
                 />
               </div>
@@ -323,18 +323,18 @@ export function SignupContent() {
 
             {/* Email Field */}
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-sm font-medium text-[#2C2C2C] dark:text-white">
+              <Label htmlFor="email" className="text-sm font-medium text-zinc-900 dark:text-white">
                 Email address
               </Label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 size-4 text-[#7A7A7A] dark:text-gray-400" />
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 size-4 text-zinc-500 dark:text-zinc-400" />
                 <Input
                   id="email"
                   type="email"
                   placeholder="Enter your email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="pl-10 border-[#EAE8E2] dark:border-gray-600 focus:border-[#3A4D6F] focus:ring-1 focus:ring-[#3A4D6F] bg-white dark:bg-gray-700 text-[#2C2C2C] dark:text-white shadow-none focus:shadow-none"
+                  className="pl-10 border-zinc-200 dark:border-zinc-600 focus:border-[#3A4D6F] focus:ring-1 focus:ring-[#3A4D6F] bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-none focus:shadow-none"
                   required
                 />
               </div>
@@ -342,24 +342,24 @@ export function SignupContent() {
 
             {/* Password Field with Strength Indicator */}
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-sm font-medium text-[#2C2C2C] dark:text-white">
+              <Label htmlFor="password" className="text-sm font-medium text-zinc-900 dark:text-white">
                 Password
               </Label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 size-4 text-[#7A7A7A] dark:text-gray-400" />
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 size-4 text-zinc-500 dark:text-zinc-400" />
                 <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
                   placeholder="Create a password"
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="pl-10 pr-10 border-[#EAE8E2] dark:border-gray-600 focus:border-[#3A4D6F] focus:ring-1 focus:ring-[#3A4D6F] bg-white dark:bg-gray-700 text-[#2C2C2C] dark:text-white shadow-none focus:shadow-none"
+                  className="pl-10 pr-10 border-zinc-200 dark:border-zinc-600 focus:border-[#3A4D6F] focus:ring-1 focus:ring-[#3A4D6F] bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-none focus:shadow-none"
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#7A7A7A] dark:text-gray-400 hover:text-[#2C2C2C] dark:hover:text-white transition-colors"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors"
                 >
                   {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
                 </button>
@@ -369,7 +369,7 @@ export function SignupContent() {
               {formData.password && (
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs text-[#7A7A7A] dark:text-gray-400">Password strength:</span>
+                    <span className="text-xs text-zinc-500 dark:text-zinc-400">Password strength:</span>
                     <span className={`text-xs font-medium ${passwordStrength.color}`}>{passwordStrength.label}</span>
                   </div>
                   <div className="flex gap-1">
@@ -377,12 +377,12 @@ export function SignupContent() {
                       <div
                         key={level}
                         className={`h-1 flex-1 rounded-full transition-colors duration-200 ${
-                          level <= passwordStrength.score ? passwordStrength.bgColor : "bg-[#EAE8E2] dark:bg-gray-700"
+                          level <= passwordStrength.score ? passwordStrength.bgColor : "bg-zinc-200 dark:bg-zinc-800"
                         }`}
                       />
                     ))}
                   </div>
-                  <div className="text-xs text-[#7A7A7A] dark:text-gray-400 space-y-1">
+                  <div className="text-xs text-zinc-500 dark:text-zinc-400 space-y-1">
                     <div className="flex items-center gap-2">
                       {formData.password.length >= 8 ? (
                         <Check className="size-3 text-green-600" />
@@ -414,30 +414,30 @@ export function SignupContent() {
 
             {/* Confirm Password Field */}
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword" className="text-sm font-medium text-[#2C2C2C] dark:text-white">
+              <Label htmlFor="confirmPassword" className="text-sm font-medium text-zinc-900 dark:text-white">
                 Confirm password
               </Label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 size-4 text-[#7A7A7A] dark:text-gray-400" />
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 size-4 text-zinc-500 dark:text-zinc-400" />
                 <Input
                   id="confirmPassword"
                   type={showConfirmPassword ? "text" : "password"}
                   placeholder="Confirm your password"
                   value={formData.confirmPassword}
                   onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                  className={`pl-10 pr-10 bg-white dark:bg-gray-700 focus:ring-1 text-[#2C2C2C] dark:text-white shadow-none focus:shadow-none ${
+                  className={`pl-10 pr-10 bg-white dark:bg-zinc-800 focus:ring-1 text-zinc-900 dark:text-white shadow-none focus:shadow-none ${
                     passwordsMatch
                       ? "border-green-500 focus:border-green-500 focus:ring-green-500"
                       : passwordsDontMatch
                         ? "border-red-500 focus:border-red-500 focus:ring-red-500"
-                        : "border-[#EAE8E2] dark:border-gray-600 focus:border-[#3A4D6F] focus:ring-[#3A4D6F]"
+                        : "border-zinc-200 dark:border-zinc-600 focus:border-[#3A4D6F] focus:ring-[#3A4D6F]"
                   }`}
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#7A7A7A] dark:text-gray-400 hover:text-[#2C2C2C] dark:hover:text-white transition-colors"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors"
                 >
                   {showConfirmPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
                 </button>
@@ -465,18 +465,18 @@ export function SignupContent() {
                 id="terms"
                 checked={agreeToTerms}
                 onCheckedChange={(checked) => setAgreeToTerms(checked as boolean)}
-                className="border-[#EAE8E2] dark:border-gray-600 data-[state=checked]:bg-[#3A4D6F] data-[state=checked]:border-[#3A4D6F] mt-0.5"
+                className="border-zinc-200 dark:border-zinc-600 data-[state=checked]:bg-zinc-900 data-[state=checked]:border-[#3A4D6F] mt-0.5"
               />
               <Label
                 htmlFor="terms"
-                className="text-sm text-[#2C2C2C] dark:text-white cursor-pointer select-none leading-relaxed"
+                className="text-sm text-zinc-900 dark:text-white cursor-pointer select-none leading-relaxed"
               >
                 I agree to the{" "}
-                <Link href="/terms" className="text-[#3A4D6F] hover:text-[#3A4D6F]/80 font-medium">
+                <Link href="/terms" className="text-zinc-900 hover:text-zinc-900/80 font-medium">
                   Terms of Service
                 </Link>{" "}
                 and{" "}
-                <Link href="/privacy" className="text-[#3A4D6F] hover:text-[#3A4D6F]/80 font-medium">
+                <Link href="/privacy" className="text-zinc-900 hover:text-zinc-900/80 font-medium">
                   Privacy Policy
                 </Link>
               </Label>
@@ -486,7 +486,7 @@ export function SignupContent() {
             <Button
               type="submit"
               disabled={isLoading || !agreeToTerms || !passwordsMatch || passwordStrength.score < 2}
-              className="w-full bg-[#3A4D6F] hover:bg-[#3A4D6F]/90 text-white font-medium py-3 transition-all duration-200 disabled:opacity-50"
+              className="w-full bg-zinc-900 hover:bg-zinc-900/90 text-white font-medium py-3 transition-all duration-200 disabled:opacity-50"
             >
               {isLoading ? (
                 <div className="flex items-center gap-2">
@@ -504,15 +504,15 @@ export function SignupContent() {
 
           {/* Divider */}
           <div className="relative">
-            <Separator className="bg-[#EAE8E2] dark:bg-gray-700" />
+            <Separator className="bg-zinc-200 dark:bg-zinc-800" />
             <div className="absolute inset-0 flex justify-center">
-              <span className="bg-white dark:bg-gray-800 px-3 text-sm text-[#7A7A7A] dark:text-gray-400">OR</span>
+              <span className="bg-white dark:bg-zinc-950 px-3 text-sm text-zinc-500 dark:text-zinc-400">OR</span>
             </div>
           </div>
 
           {/* Social Login Grid - 2x2 */}
           <div className="space-y-3">
-            <p className="text-sm text-[#7A7A7A] dark:text-gray-400 text-center">Continue with</p>
+            <p className="text-sm text-zinc-500 dark:text-zinc-400 text-center">Continue with</p>
             <div className="grid grid-cols-2 gap-3">
               {socialProviders.map((provider) => {
                 const IconComponent = provider.icon
@@ -521,7 +521,7 @@ export function SignupContent() {
                     key={provider.name}
                     variant="outline"
                     onClick={() => handleSocialSignup(provider.name)}
-                    className={`border-[#EAE8E2] dark:border-gray-600 bg-white dark:bg-gray-700 text-[#2C2C2C] dark:text-white transition-all duration-200 ${provider.color}`}
+                    className={`border-zinc-200 dark:border-zinc-600 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white transition-all duration-200 ${provider.color}`}
                   >
                     <IconComponent className={`size-4 mr-2 ${provider.iconColor}`} />
                     {provider.name}
@@ -532,18 +532,18 @@ export function SignupContent() {
           </div>
 
           {/* Security Notice */}
-          <div className="flex items-center gap-2 p-3 bg-[#3A4D6F]/5 dark:bg-[#3A4D6F]/10 rounded-lg border border-[#3A4D6F]/20 dark:border-[#3A4D6F]/30">
-            <Shield className="size-4 text-[#3A4D6F] flex-shrink-0" />
-            <p className="text-xs text-[#2C2C2C] dark:text-white">
+          <div className="flex items-center gap-2 p-3 bg-zinc-900/5 dark:bg-zinc-900/10 rounded-lg border border-[#3A4D6F]/20 dark:border-[#3A4D6F]/30">
+            <Shield className="size-4 text-zinc-900 flex-shrink-0" />
+            <p className="text-xs text-zinc-900 dark:text-white">
               Your data is protected with enterprise-grade security
             </p>
           </div>
 
           {/* Footer Link */}
           <div className="text-center">
-            <p className="text-sm text-[#7A7A7A] dark:text-gray-400">
+            <p className="text-sm text-zinc-500 dark:text-zinc-400">
               Already have an account?{" "}
-              <Link href="/login" className="text-[#3A4D6F] hover:text-[#3A4D6F]/80 font-medium transition-colors">
+              <Link href="/login" className="text-zinc-900 hover:text-zinc-900/80 font-medium transition-colors">
                 Sign in
               </Link>
             </p>

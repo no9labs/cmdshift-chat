@@ -67,8 +67,7 @@ export function ChatInterface({ conversationId = 'new' }: ChatInterfaceProps) {
   useEffect(() => {
     // Load conversation if not new
     if (conversationId !== 'new') {
-      // TODO: Load conversation messages from Redis/DB
-      console.log('Loading conversation:', conversationId);
+      // Load conversation messages from Redis/DB
     }
   }, [conversationId]);
 
@@ -79,9 +78,7 @@ export function ChatInterface({ conversationId = 'new' }: ChatInterfaceProps) {
       
       setIsLoading(true);
       try {
-        console.log('Loading conversation:', conversationId);
         const response = await fetch(`/web-api/conversations/${conversationId}/messages`);
-        console.log('Response status:', response.status);
         if (response.ok) {
           const data = await response.json();
           const formattedMessages = (data.messages || []).map((msg: any) => ({
@@ -149,18 +146,11 @@ export function ChatInterface({ conversationId = 'new' }: ChatInterfaceProps) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      // Debug: Log all response headers
-      console.log('Response headers:', Array.from(response.headers.entries()));
-      
       // Capture conversation ID from response headers (for both streaming and non-streaming)
       const convIdHeader = response.headers.get('X-Conversation-Id');
-      console.log('X-Conversation-Id header value:', convIdHeader);
       
       if (convIdHeader) {
         newConversationId = convIdHeader;
-        console.log('Successfully captured conversation ID:', newConversationId);
-      } else {
-        console.log('No X-Conversation-Id header found');
       }
 
       const reader = response.body?.getReader();
@@ -193,7 +183,6 @@ export function ChatInterface({ conversationId = 'new' }: ChatInterfaceProps) {
 
             try {
               const parsed = JSON.parse(data);
-              console.log('SSE Parsed Data:', parsed);
               
               if (parsed.model) {
                 selectedModelForMessage = parsed.model;
@@ -226,7 +215,7 @@ export function ChatInterface({ conversationId = 'new' }: ChatInterfaceProps) {
                   }
                 });
               }
-            } catch (e) {
+            } catch (e: unknown) {
               console.error('Error parsing SSE data:', e);
             }
           }
@@ -246,16 +235,12 @@ export function ChatInterface({ conversationId = 'new' }: ChatInterfaceProps) {
       const fullResponse = streamingMessageRef.current;
       
       // If this was a new conversation, update the URL and generate title
-      console.log('Title generation check - conversationId:', conversationId, 'newConversationId:', newConversationId, 'messages.length:', messages.length);
-      
       // Check if this is first message exchange
       if (newConversationId && messages.length === 0 && fullResponse) {
-        console.log('Title generation triggered for new conversation');
         // Update URL without full page reload
         window.history.replaceState({}, '', `/chat/${newConversationId}`);
         
         // Generate title for new conversations
-        console.log('Generating conversation title...');
         
         // Call backend to generate and save title
         try {
@@ -273,16 +258,13 @@ export function ChatInterface({ conversationId = 'new' }: ChatInterfaceProps) {
           });
           
           if (titleResponse.ok) {
-            console.log('Title generated, waiting for backend to save...');
             // Give backend time to save title to Redis before refreshing
             setTimeout(() => {
-              console.log('Refreshing sidebar after delay...');
               if (window.refreshConversations) {
                 window.refreshConversations();
                 
                 // Retry once more after another delay if needed
                 setTimeout(() => {
-                  console.log('Second refresh attempt...');
                   if (window.refreshConversations) {
                     window.refreshConversations();
                   }
@@ -305,7 +287,7 @@ export function ChatInterface({ conversationId = 'new' }: ChatInterfaceProps) {
   };
 
   return (
-    <div className="flex flex-col h-full bg-[#F8F6F2]">{/* Changed from h-screen to h-full since parent controls height */}
+    <div className="flex flex-col h-full bg-white">{/* Changed from h-screen to h-full since parent controls height */}
       
       {/* Messages Area with Loading State */}
       <div className="flex-1 overflow-y-auto">

@@ -46,7 +46,7 @@ export function ThemeToggle({ className }: { className?: string }) {
           <Button
             variant="outline"
             size="icon"
-            className="border-[#EAE8E2] bg-white hover:bg-[#EAE8E2] text-[#2C2C2C] shadow-sm dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:bg-gray-700"
+            className="border-zinc-200 bg-white hover:bg-zinc-100 text-zinc-900 shadow-sm dark:bg-zinc-950 dark:border-zinc-800 dark:text-zinc-50 dark:hover:bg-zinc-900"
           >
           {getThemeIcon()}
           <span className="sr-only">Toggle theme</span>
@@ -54,7 +54,7 @@ export function ThemeToggle({ className }: { className?: string }) {
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align="end"
-        className="bg-white dark:bg-gray-800 border-[#EAE8E2] dark:border-gray-700 shadow-lg"
+        className="bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 shadow-lg"
       >
         {themes.map((themeOption) => {
           const IconComponent = themeOption.icon
@@ -62,11 +62,11 @@ export function ThemeToggle({ className }: { className?: string }) {
             <DropdownMenuItem
               key={themeOption.value}
               onClick={() => setTheme(themeOption.value)}
-              className="flex items-center gap-2 text-[#2C2C2C] dark:text-white hover:!bg-[#EAE8E2] dark:hover:!bg-gray-700 cursor-pointer"
+              className="flex items-center gap-2 text-zinc-900 dark:text-zinc-50 hover:!bg-zinc-100 dark:hover:!bg-zinc-900 cursor-pointer"
             >
               <IconComponent className="size-4" />
               <span>{themeOption.label}</span>
-              {theme === themeOption.value && <Check className="size-4 ml-auto text-[#3A4D6F]" />}
+              {theme === themeOption.value && <Check className="size-4 ml-auto text-zinc-900 dark:text-zinc-50" />}
             </DropdownMenuItem>
           )
         })}

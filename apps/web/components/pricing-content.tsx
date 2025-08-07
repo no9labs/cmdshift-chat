@@ -151,25 +151,25 @@ export function PricingContent() {
   }
 
   return (
-    <div className="flex flex-col h-full bg-[#F8F6F2] dark:bg-gray-900">
+    <div className="flex flex-col h-full bg-white dark:bg-gray-900">
       {/* Header */}
-      <div className="p-6 bg-[#F8F6F2] dark:bg-gray-900 flex-shrink-0 text-center relative">
+      <div className="p-6 bg-white dark:bg-gray-900 flex-shrink-0 text-center relative">
         <div className="absolute top-6 right-6">
           <ThemeToggle />
         </div>
-        <h1 className="text-3xl font-semibold text-[#2C2C2C] dark:text-white mb-2">Choose Your Plan</h1>
-        <p className="text-lg text-[#7A7A7A] dark:text-gray-400 mb-8">
+        <h1 className="text-3xl font-semibold text-zinc-900 dark:text-white mb-2">Choose Your Plan</h1>
+        <p className="text-lg text-zinc-500 dark:text-zinc-400 mb-8">
           Select the perfect plan for your needs. Upgrade or downgrade at any time.
         </p>
 
         {/* Billing Toggle */}
-        <div className="inline-flex items-center bg-white dark:bg-gray-800 rounded-full p-1 border border-[#EAE8E2] dark:border-gray-700 shadow-sm">
+        <div className="inline-flex items-center bg-white dark:bg-zinc-950 rounded-full p-1 border border-zinc-200 dark:border-zinc-800 shadow-sm">
           <button
             onClick={() => setIsYearly(false)}
             className={`px-6 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
               !isYearly
-                ? "bg-[#3A4D6F] text-white shadow-sm"
-                : "text-[#7A7A7A] dark:text-gray-400 hover:text-[#2C2C2C] dark:hover:text-white"
+                ? "bg-zinc-900 text-white shadow-sm"
+                : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white"
             }`}
           >
             Monthly
@@ -178,8 +178,8 @@ export function PricingContent() {
             onClick={() => setIsYearly(true)}
             className={`px-6 py-2 rounded-full text-sm font-medium transition-all duration-200 relative ${
               isYearly
-                ? "bg-[#3A4D6F] text-white shadow-sm"
-                : "text-[#7A7A7A] dark:text-gray-400 hover:text-[#2C2C2C] dark:hover:text-white"
+                ? "bg-zinc-900 text-white shadow-sm"
+                : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white"
             }`}
           >
             Yearly
@@ -202,15 +202,15 @@ export function PricingContent() {
               return (
                 <Card
                   key={plan.id}
-                  className={`relative bg-white dark:bg-gray-800 border-2 shadow-sm transition-all duration-200 hover:shadow-md ${
+                  className={`relative bg-white dark:bg-zinc-950 border-2 shadow-sm transition-all duration-200 hover:shadow-md ${
                     plan.popular
                       ? "border-[#3A4D6F] ring-2 ring-[#3A4D6F]/20 hover:border-[#3A4D6F]/80 dark:hover:border-[#3A4D6F]/80"
-                      : "border-[#EAE8E2] dark:border-gray-700 hover:border-[#3A4D6F]/20 dark:hover:border-[#3A4D6F]/30"
+                      : "border-zinc-200 dark:border-zinc-800 hover:border-[#3A4D6F]/20 dark:hover:border-[#3A4D6F]/30"
                   }`}
                 >
                   {plan.popular && (
                     <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                      <Badge className="bg-[#3A4D6F] text-white hover:bg-[#3A4D6F] px-3 py-1">
+                      <Badge className="bg-zinc-900 text-white hover:bg-zinc-900 px-3 py-1">
                         <Star className="size-3 mr-1" />
                         Most Popular
                       </Badge>
@@ -220,21 +220,21 @@ export function PricingContent() {
                   <CardHeader className="text-center pb-4">
                     <div className="flex justify-center mb-4">
                       <div
-                        className={`p-3 rounded-full ${plan.popular ? "bg-[#3A4D6F]" : "bg-[#EAE8E2] dark:bg-gray-700"}`}
+                        className={`p-3 rounded-full ${plan.popular ? "bg-zinc-900" : "bg-zinc-200 dark:bg-zinc-800"}`}
                       >
                         <IconComponent
-                          className={`size-6 ${plan.popular ? "text-white" : "text-[#3A4D6F] dark:text-gray-300"}`}
+                          className={`size-6 ${plan.popular ? "text-white" : "text-zinc-900 dark:text-gray-300"}`}
                         />
                       </div>
                     </div>
-                    <CardTitle className="text-xl font-semibold text-[#2C2C2C] dark:text-white">{plan.name}</CardTitle>
-                    <CardDescription className="text-[#7A7A7A] dark:text-gray-400">{plan.description}</CardDescription>
+                    <CardTitle className="text-xl font-semibold text-zinc-900 dark:text-white">{plan.name}</CardTitle>
+                    <CardDescription className="text-zinc-500 dark:text-zinc-400">{plan.description}</CardDescription>
 
                     <div className="mt-4">
                       <div className="flex items-baseline justify-center gap-1">
-                        <span className="text-3xl font-bold text-[#2C2C2C] dark:text-white">{getPrice(plan)}</span>
+                        <span className="text-3xl font-bold text-zinc-900 dark:text-white">{getPrice(plan)}</span>
                         {plan.monthlyPrice !== null && plan.monthlyPrice > 0 && (
-                          <span className="text-[#7A7A7A] dark:text-gray-400">{getPeriod()}</span>
+                          <span className="text-zinc-500 dark:text-zinc-400">{getPeriod()}</span>
                         )}
                       </div>
                       {isYearly && savings && <p className="text-sm text-green-600 mt-1">Save ${savings}/year</p>}
@@ -245,8 +245,8 @@ export function PricingContent() {
                     <Button
                       className={`w-full ${
                         plan.buttonVariant === "default"
-                          ? "bg-[#3A4D6F] hover:bg-[#3A4D6F]/90 text-white"
-                          : "border-[#EAE8E2] dark:border-gray-600 text-[#2C2C2C] dark:text-white hover:bg-[#EAE8E2] dark:hover:bg-gray-700 bg-transparent"
+                          ? "bg-zinc-900 hover:bg-zinc-900/90 text-white"
+                          : "border-zinc-200 dark:border-zinc-600 text-zinc-900 dark:text-white hover:bg-zinc-200 dark:hover:bg-zinc-700 bg-transparent"
                       }`}
                       variant={plan.buttonVariant}
                     >
@@ -254,28 +254,28 @@ export function PricingContent() {
                     </Button>
 
                     <div className="space-y-3">
-                      <h4 className="font-medium text-[#2C2C2C] dark:text-white flex items-center gap-2">
-                        <Sparkles className="size-4 text-[#3A4D6F]" />
+                      <h4 className="font-medium text-zinc-900 dark:text-white flex items-center gap-2">
+                        <Sparkles className="size-4 text-zinc-900" />
                         Features included:
                       </h4>
                       <ul className="space-y-2">
                         {plan.features.map((feature, index) => (
                           <li key={index} className="flex items-start gap-2 text-sm">
                             <Check className="size-4 text-green-600 mt-0.5 flex-shrink-0" />
-                            <span className="text-[#2C2C2C] dark:text-white">{feature}</span>
+                            <span className="text-zinc-900 dark:text-white">{feature}</span>
                           </li>
                         ))}
                       </ul>
 
                       {plan.limitations && (
-                        <div className="pt-2 border-t border-[#EAE8E2] dark:border-gray-700">
+                        <div className="pt-2 border-t border-zinc-200 dark:border-zinc-800">
                           <ul className="space-y-1">
                             {plan.limitations.map((limitation, index) => (
                               <li
                                 key={index}
-                                className="flex items-start gap-2 text-xs text-[#7A7A7A] dark:text-gray-400"
+                                className="flex items-start gap-2 text-xs text-zinc-500 dark:text-zinc-400"
                               >
-                                <span className="text-[#7A7A7A] dark:text-gray-400 mt-0.5">•</span>
+                                <span className="text-zinc-500 dark:text-zinc-400 mt-0.5">•</span>
                                 <span>{limitation}</span>
                               </li>
                             ))}
@@ -290,34 +290,34 @@ export function PricingContent() {
           </div>
 
           {/* Additional Info */}
-          <div className="text-center py-8 border-t border-[#EAE8E2] dark:border-gray-700">
+          <div className="text-center py-8 border-t border-zinc-200 dark:border-zinc-800">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
               <div className="flex flex-col items-center gap-3">
-                <div className="p-3 bg-[#EAE8E2] dark:bg-gray-700 rounded-full">
-                  <Shield className="size-6 text-[#3A4D6F] dark:text-gray-300" />
+                <div className="p-3 bg-zinc-200 dark:bg-zinc-800 rounded-full">
+                  <Shield className="size-6 text-zinc-900 dark:text-gray-300" />
                 </div>
-                <h3 className="font-medium text-[#2C2C2C] dark:text-white">Secure & Private</h3>
-                <p className="text-sm text-[#7A7A7A] dark:text-gray-400 text-center">
+                <h3 className="font-medium text-zinc-900 dark:text-white">Secure & Private</h3>
+                <p className="text-sm text-zinc-500 dark:text-zinc-400 text-center">
                   Your data is encrypted and never used to train AI models
                 </p>
               </div>
 
               <div className="flex flex-col items-center gap-3">
-                <div className="p-3 bg-[#EAE8E2] dark:bg-gray-700 rounded-full">
-                  <Headphones className="size-6 text-[#3A4D6F] dark:text-gray-300" />
+                <div className="p-3 bg-zinc-200 dark:bg-zinc-800 rounded-full">
+                  <Headphones className="size-6 text-zinc-900 dark:text-gray-300" />
                 </div>
-                <h3 className="font-medium text-[#2C2C2C] dark:text-white">24/7 Support</h3>
-                <p className="text-sm text-[#7A7A7A] dark:text-gray-400 text-center">
+                <h3 className="font-medium text-zinc-900 dark:text-white">24/7 Support</h3>
+                <p className="text-sm text-zinc-500 dark:text-zinc-400 text-center">
                   Get help when you need it with our dedicated support team
                 </p>
               </div>
 
               <div className="flex flex-col items-center gap-3">
-                <div className="p-3 bg-[#EAE8E2] dark:bg-gray-700 rounded-full">
-                  <Globe className="size-6 text-[#3A4D6F] dark:text-gray-300" />
+                <div className="p-3 bg-zinc-200 dark:bg-zinc-800 rounded-full">
+                  <Globe className="size-6 text-zinc-900 dark:text-gray-300" />
                 </div>
-                <h3 className="font-medium text-[#2C2C2C] dark:text-white">Global Access</h3>
-                <p className="text-sm text-[#7A7A7A] dark:text-gray-400 text-center">
+                <h3 className="font-medium text-zinc-900 dark:text-white">Global Access</h3>
+                <p className="text-sm text-zinc-500 dark:text-zinc-400 text-center">
                   Access CmdShift from anywhere in the world, anytime
                 </p>
               </div>
@@ -327,25 +327,25 @@ export function PricingContent() {
           {/* FAQ Section */}
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-8">
-              <h2 className="text-2xl font-semibold text-[#2C2C2C] dark:text-white mb-2">Frequently Asked Questions</h2>
-              <p className="text-[#7A7A7A] dark:text-gray-400">
+              <h2 className="text-2xl font-semibold text-zinc-900 dark:text-white mb-2">Frequently Asked Questions</h2>
+              <p className="text-zinc-500 dark:text-zinc-400">
                 Everything you need to know about our pricing and plans
               </p>
             </div>
 
-            <Card className="bg-white dark:bg-gray-800 border-[#EAE8E2] dark:border-gray-700 shadow-sm hover:border-[#3A4D6F]/20 dark:hover:border-[#3A4D6F]/30 transition-colors duration-200">
+            <Card className="bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 shadow-sm hover:border-[#3A4D6F]/20 dark:hover:border-[#3A4D6F]/30 transition-colors duration-200">
               <CardContent className="p-6">
                 <Accordion type="single" collapsible className="space-y-2">
                   {faqData.map((faq, index) => (
                     <AccordionItem
                       key={index}
                       value={`item-${index}`}
-                      className="border-b border-[#EAE8E2] dark:border-gray-700 last:border-b-0"
+                      className="border-b border-zinc-200 dark:border-zinc-800 last:border-b-0"
                     >
-                      <AccordionTrigger className="text-left font-medium text-[#2C2C2C] dark:text-white hover:text-[#3A4D6F] hover:no-underline py-4">
+                      <AccordionTrigger className="text-left font-medium text-zinc-900 dark:text-white hover:text-zinc-900 hover:no-underline py-4">
                         {faq.question}
                       </AccordionTrigger>
-                      <AccordionContent className="text-[#7A7A7A] dark:text-gray-400 pb-4 leading-relaxed">
+                      <AccordionContent className="text-zinc-500 dark:text-zinc-400 pb-4 leading-relaxed">
                         {faq.answer}
                       </AccordionContent>
                     </AccordionItem>
@@ -356,17 +356,17 @@ export function PricingContent() {
           </div>
 
           {/* CTA Section */}
-          <div className="text-center py-12 bg-gradient-to-r from-[#3A4D6F]/5 to-[#3A4D6F]/10 dark:from-[#3A4D6F]/10 dark:to-[#3A4D6F]/20 rounded-2xl">
-            <h2 className="text-2xl font-semibold text-[#2C2C2C] dark:text-white mb-4">Ready to get started?</h2>
-            <p className="text-[#7A7A7A] dark:text-gray-400 mb-6 max-w-2xl mx-auto">
+          <div className="text-center py-12 bg-gradient-to-r from-zinc-900/5 to-[#3A4D6F]/10 dark:from-zinc-900/10 dark:to-[#3A4D6F]/20 rounded-2xl">
+            <h2 className="text-2xl font-semibold text-zinc-900 dark:text-white mb-4">Ready to get started?</h2>
+            <p className="text-zinc-500 dark:text-zinc-400 mb-6 max-w-2xl mx-auto">
               Join thousands of professionals who trust CmdShift for their AI-powered conversations. Start your free
               trial today, no credit card required.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button className="bg-[#3A4D6F] hover:bg-[#3A4D6F]/90 text-white px-8">Start Free Trial</Button>
+              <Button className="bg-zinc-900 hover:bg-zinc-900/90 text-white px-8">Start Free Trial</Button>
               <Button
                 variant="outline"
-                className="border-[#EAE8E2] dark:border-gray-600 text-[#2C2C2C] dark:text-white hover:bg-[#EAE8E2] dark:hover:bg-gray-700 bg-transparent px-8"
+                className="border-zinc-200 dark:border-zinc-600 text-zinc-900 dark:text-white hover:bg-zinc-200 dark:hover:bg-zinc-700 bg-transparent px-8"
               >
                 Contact Sales
               </Button>

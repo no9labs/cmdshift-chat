@@ -121,22 +121,22 @@ export function UsageContent() {
   const maxActivity = Math.max(...activityData.map((d) => d.messages))
 
   return (
-    <div className="flex flex-col h-full bg-[#F8F6F2] dark:bg-gray-900">
+    <div className="flex flex-col h-full bg-white dark:bg-gray-900">
       {/* Header */}
-      <div className="p-6 bg-[#F8F6F2] dark:bg-gray-900 flex-shrink-0">
+      <div className="p-6 bg-white dark:bg-gray-900 flex-shrink-0">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-[#2C2C2C] dark:text-white">Usage & Analytics</h1>
-            <p className="text-base text-[#7A7A7A] dark:text-gray-400 mt-1">
+            <h1 className="text-2xl font-semibold text-zinc-900 dark:text-white">Usage & Analytics</h1>
+            <p className="text-base text-zinc-500 dark:text-zinc-400 mt-1">
               Monitor your CmdShift usage and performance
             </p>
           </div>
           <div className="flex items-center gap-3">
             <Select value={timeRange} onValueChange={setTimeRange}>
-              <SelectTrigger className="w-32 border-[#EAE8E2] dark:border-gray-600 focus:border-[#3A4D6F] focus:ring-[#3A4D6F] bg-white dark:bg-gray-700 text-[#2C2C2C] dark:text-white">
+              <SelectTrigger className="w-32 border-zinc-200 dark:border-zinc-600 focus:border-[#3A4D6F] focus:ring-[#3A4D6F] bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-white dark:bg-gray-800 border-[#EAE8E2] dark:border-gray-700">
+              <SelectContent className="bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800">
                 <SelectItem value="24h">Last 24h</SelectItem>
                 <SelectItem value="7d">Last 7 days</SelectItem>
                 <SelectItem value="30d">Last 30 days</SelectItem>
@@ -146,13 +146,13 @@ export function UsageContent() {
             <Button
               variant="outline"
               size="icon"
-              className="border-[#EAE8E2] dark:border-gray-600 text-[#2C2C2C] dark:text-white hover:bg-[#EAE8E2] dark:hover:bg-gray-700 bg-transparent"
+              className="border-zinc-200 dark:border-zinc-600 text-zinc-900 dark:text-white hover:bg-zinc-200 dark:hover:bg-zinc-700 bg-transparent"
             >
               <RefreshCw className="size-4" />
             </Button>
             <Button
               variant="outline"
-              className="border-[#EAE8E2] dark:border-gray-600 text-[#2C2C2C] dark:text-white hover:bg-[#EAE8E2] dark:hover:bg-gray-700 bg-transparent"
+              className="border-zinc-200 dark:border-zinc-600 text-zinc-900 dark:text-white hover:bg-zinc-200 dark:hover:bg-zinc-700 bg-transparent"
             >
               <Download className="size-4 mr-2" />
               Export
@@ -168,19 +168,19 @@ export function UsageContent() {
           {/* Stats Cards Row */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Messages Card */}
-            <Card className="bg-white dark:bg-gray-800 border-[#EAE8E2] dark:border-gray-700 shadow-sm hover:border-[#3A4D6F]/20 dark:hover:border-[#3A4D6F]/30 transition-colors duration-200">
+            <Card className="bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 shadow-sm hover:border-[#3A4D6F]/20 dark:hover:border-[#3A4D6F]/30 transition-colors duration-200">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <MessageSquare className="size-5 text-[#3A4D6F] dark:text-gray-300" />
-                      <p className="text-sm font-medium text-[#7A7A7A] dark:text-gray-400">Messages</p>
+                      <MessageSquare className="size-5 text-zinc-900 dark:text-gray-300" />
+                      <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Messages</p>
                     </div>
                     <div className="space-y-1">
-                      <p className="text-2xl font-semibold text-[#2C2C2C] dark:text-white">
+                      <p className="text-2xl font-semibold text-zinc-900 dark:text-white">
                         {statsData.messages.current.toLocaleString()}
                       </p>
-                      <p className="text-sm text-[#7A7A7A] dark:text-gray-400">
+                      <p className="text-sm text-zinc-500 dark:text-zinc-400">
                         of {statsData.messages.limit.toLocaleString()} limit
                       </p>
                     </div>
@@ -193,9 +193,9 @@ export function UsageContent() {
                   </div>
                 </div>
                 <div className="mt-4">
-                  <div className="w-full bg-[#EAE8E2] dark:bg-gray-700 rounded-full h-2">
+                  <div className="w-full bg-zinc-200 dark:bg-zinc-800 rounded-full h-2">
                     <div
-                      className="bg-[#3A4D6F] h-2 rounded-full transition-all duration-300"
+                      className="bg-zinc-900 h-2 rounded-full transition-all duration-300"
                       style={{ width: `${(statsData.messages.current / statsData.messages.limit) * 100}%` }}
                     ></div>
                   </div>
@@ -204,19 +204,19 @@ export function UsageContent() {
             </Card>
 
             {/* Tokens Card */}
-            <Card className="bg-white dark:bg-gray-800 border-[#EAE8E2] dark:border-gray-700 shadow-sm hover:border-[#3A4D6F]/20 dark:hover:border-[#3A4D6F]/30 transition-colors duration-200">
+            <Card className="bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 shadow-sm hover:border-[#3A4D6F]/20 dark:hover:border-[#3A4D6F]/30 transition-colors duration-200">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <Zap className="size-5 text-[#3A4D6F] dark:text-gray-300" />
-                      <p className="text-sm font-medium text-[#7A7A7A] dark:text-gray-400">Tokens</p>
+                      <Zap className="size-5 text-zinc-900 dark:text-gray-300" />
+                      <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Tokens</p>
                     </div>
                     <div className="space-y-1">
-                      <p className="text-2xl font-semibold text-[#2C2C2C] dark:text-white">
+                      <p className="text-2xl font-semibold text-zinc-900 dark:text-white">
                         {statsData.tokens.current.toLocaleString()}
                       </p>
-                      <p className="text-sm text-[#7A7A7A] dark:text-gray-400">
+                      <p className="text-sm text-zinc-500 dark:text-zinc-400">
                         of {statsData.tokens.limit.toLocaleString()} limit
                       </p>
                     </div>
@@ -229,9 +229,9 @@ export function UsageContent() {
                   </div>
                 </div>
                 <div className="mt-4">
-                  <div className="w-full bg-[#EAE8E2] dark:bg-gray-700 rounded-full h-2">
+                  <div className="w-full bg-zinc-200 dark:bg-zinc-800 rounded-full h-2">
                     <div
-                      className="bg-[#3A4D6F] h-2 rounded-full transition-all duration-300"
+                      className="bg-zinc-900 h-2 rounded-full transition-all duration-300"
                       style={{ width: `${(statsData.tokens.current / statsData.tokens.limit) * 100}%` }}
                     ></div>
                   </div>
@@ -240,19 +240,19 @@ export function UsageContent() {
             </Card>
 
             {/* Cost Card */}
-            <Card className="bg-white dark:bg-gray-800 border-[#EAE8E2] dark:border-gray-700 shadow-sm hover:border-[#3A4D6F]/20 dark:hover:border-[#3A4D6F]/30 transition-colors duration-200">
+            <Card className="bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 shadow-sm hover:border-[#3A4D6F]/20 dark:hover:border-[#3A4D6F]/30 transition-colors duration-200">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <DollarSign className="size-5 text-[#3A4D6F] dark:text-gray-300" />
-                      <p className="text-sm font-medium text-[#7A7A7A] dark:text-gray-400">Cost</p>
+                      <DollarSign className="size-5 text-zinc-900 dark:text-gray-300" />
+                      <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Cost</p>
                     </div>
                     <div className="space-y-1">
-                      <p className="text-2xl font-semibold text-[#2C2C2C] dark:text-white">
+                      <p className="text-2xl font-semibold text-zinc-900 dark:text-white">
                         ${statsData.cost.current.toFixed(2)}
                       </p>
-                      <p className="text-sm text-[#7A7A7A] dark:text-gray-400">
+                      <p className="text-sm text-zinc-500 dark:text-zinc-400">
                         of ${statsData.cost.limit.toFixed(2)} budget
                       </p>
                     </div>
@@ -265,9 +265,9 @@ export function UsageContent() {
                   </div>
                 </div>
                 <div className="mt-4">
-                  <div className="w-full bg-[#EAE8E2] dark:bg-gray-700 rounded-full h-2">
+                  <div className="w-full bg-zinc-200 dark:bg-zinc-800 rounded-full h-2">
                     <div
-                      className="bg-[#3A4D6F] h-2 rounded-full transition-all duration-300"
+                      className="bg-zinc-900 h-2 rounded-full transition-all duration-300"
                       style={{ width: `${(statsData.cost.current / statsData.cost.limit) * 100}%` }}
                     ></div>
                   </div>
@@ -279,13 +279,13 @@ export function UsageContent() {
           {/* Charts Row */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Model Usage Pie Chart */}
-            <Card className="bg-white dark:bg-gray-800 border-[#EAE8E2] dark:border-gray-700 shadow-sm hover:border-[#3A4D6F]/20 dark:hover:border-[#3A4D6F]/30 transition-colors duration-200">
+            <Card className="bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 shadow-sm hover:border-[#3A4D6F]/20 dark:hover:border-[#3A4D6F]/30 transition-colors duration-200">
               <CardHeader className="pb-4">
-                <CardTitle className="text-lg font-semibold text-[#2C2C2C] dark:text-white flex items-center gap-2">
-                  <BarChart3 className="size-5 text-[#3A4D6F] dark:text-gray-300" />
+                <CardTitle className="text-lg font-semibold text-zinc-900 dark:text-white flex items-center gap-2">
+                  <BarChart3 className="size-5 text-zinc-900 dark:text-gray-300" />
                   Model Usage Distribution
                 </CardTitle>
-                <CardDescription className="text-[#7A7A7A] dark:text-gray-400">
+                <CardDescription className="text-zinc-500 dark:text-zinc-400">
                   Breakdown of usage by AI model
                 </CardDescription>
               </CardHeader>
@@ -318,9 +318,9 @@ export function UsageContent() {
                       })}
                     </svg>
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                      <div className="text-center bg-white dark:bg-gray-800 rounded-full p-3 shadow-sm border border-[#EAE8E2] dark:border-gray-700">
-                        <div className="text-xl font-semibold text-[#2C2C2C] dark:text-white">Total</div>
-                        <div className="text-sm text-[#7A7A7A] dark:text-gray-400">Usage</div>
+                      <div className="text-center bg-white dark:bg-zinc-950 rounded-full p-3 shadow-sm border border-zinc-200 dark:border-zinc-800">
+                        <div className="text-xl font-semibold text-zinc-900 dark:text-white">Total</div>
+                        <div className="text-sm text-zinc-500 dark:text-zinc-400">Usage</div>
                       </div>
                     </div>
                   </div>
@@ -330,9 +330,9 @@ export function UsageContent() {
                     <div key={item.name} className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <div className="size-3 rounded-full" style={{ backgroundColor: item.color }}></div>
-                        <span className="font-medium text-[#2C2C2C] dark:text-white">{item.name}</span>
+                        <span className="font-medium text-zinc-900 dark:text-white">{item.name}</span>
                       </div>
-                      <span className="text-sm text-[#7A7A7A] dark:text-gray-400">{item.usage}%</span>
+                      <span className="text-sm text-zinc-500 dark:text-zinc-400">{item.usage}%</span>
                     </div>
                   ))}
                 </div>
@@ -340,13 +340,13 @@ export function UsageContent() {
             </Card>
 
             {/* Activity Line Graph */}
-            <Card className="bg-white dark:bg-gray-800 border-[#EAE8E2] dark:border-gray-700 shadow-sm hover:border-[#3A4D6F]/20 dark:hover:border-[#3A4D6F]/30 transition-colors duration-200">
+            <Card className="bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 shadow-sm hover:border-[#3A4D6F]/20 dark:hover:border-[#3A4D6F]/30 transition-colors duration-200">
               <CardHeader className="pb-4">
-                <CardTitle className="text-lg font-semibold text-[#2C2C2C] dark:text-white flex items-center gap-2">
-                  <TrendingUp className="size-5 text-[#3A4D6F] dark:text-gray-300" />
+                <CardTitle className="text-lg font-semibold text-zinc-900 dark:text-white flex items-center gap-2">
+                  <TrendingUp className="size-5 text-zinc-900 dark:text-gray-300" />
                   Daily Activity
                 </CardTitle>
-                <CardDescription className="text-[#7A7A7A] dark:text-gray-400">
+                <CardDescription className="text-zinc-500 dark:text-zinc-400">
                   Messages sent over the last 14 days
                 </CardDescription>
               </CardHeader>
@@ -355,17 +355,17 @@ export function UsageContent() {
                   {activityData.map((item, index) => (
                     <div key={index} className="flex flex-col items-center gap-1 sm:gap-2 flex-1 min-w-0">
                       <div
-                        className="bg-[#3A4D6F] rounded-t-sm transition-all duration-300 hover:bg-[#3A4D6F]/80 w-full min-h-[4px] max-w-full"
+                        className="bg-zinc-900 rounded-t-sm transition-all duration-300 hover:bg-zinc-900/80 w-full min-h-[4px] max-w-full"
                         style={{ height: `${(item.messages / maxActivity) * 160}px` }}
                         title={`${item.date}: ${item.messages} messages`}
                       ></div>
-                      <span className="text-[10px] sm:text-xs text-[#7A7A7A] dark:text-gray-400 transform rotate-45 origin-left whitespace-nowrap truncate max-w-full overflow-hidden">
+                      <span className="text-[10px] sm:text-xs text-zinc-500 dark:text-zinc-400 transform rotate-45 origin-left whitespace-nowrap truncate max-w-full overflow-hidden">
                         {item.date.split(" ")[1]}
                       </span>
                     </div>
                   ))}
                 </div>
-                <div className="flex items-center justify-between text-xs sm:text-sm text-[#7A7A7A] dark:text-gray-400 px-1">
+                <div className="flex items-center justify-between text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 px-1">
                   <span className="truncate">Peak: {maxActivity}</span>
                   <span className="truncate">
                     Avg: {Math.round(activityData.reduce((sum, d) => sum + d.messages, 0) / activityData.length)}
@@ -376,60 +376,60 @@ export function UsageContent() {
           </div>
 
           {/* Recent Conversations Table */}
-          <Card className="bg-white dark:bg-gray-800 border-[#EAE8E2] dark:border-gray-700 shadow-sm hover:border-[#3A4D6F]/20 dark:hover:border-[#3A4D6F]/30 transition-colors duration-200">
+          <Card className="bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 shadow-sm hover:border-[#3A4D6F]/20 dark:hover:border-[#3A4D6F]/30 transition-colors duration-200">
             <CardHeader className="pb-4">
-              <CardTitle className="text-lg font-semibold text-[#2C2C2C] dark:text-white flex items-center gap-2">
-                <MessageSquare className="size-5 text-[#3A4D6F] dark:text-gray-300" />
+              <CardTitle className="text-lg font-semibold text-zinc-900 dark:text-white flex items-center gap-2">
+                <MessageSquare className="size-5 text-zinc-900 dark:text-gray-300" />
                 Recent Conversations
               </CardTitle>
-              <CardDescription className="text-[#7A7A7A] dark:text-gray-400">
+              <CardDescription className="text-zinc-500 dark:text-zinc-400">
                 Your most recent chat sessions and their usage metrics
               </CardDescription>
             </CardHeader>
             <CardContent>
               <Table>
                 <TableHeader>
-                  <TableRow className="border-[#EAE8E2] dark:border-gray-700">
-                    <TableHead className="text-[#2C2C2C] dark:text-white font-medium">Conversation</TableHead>
-                    <TableHead className="text-[#2C2C2C] dark:text-white font-medium">Model</TableHead>
-                    <TableHead className="text-[#2C2C2C] dark:text-white font-medium">Messages</TableHead>
-                    <TableHead className="text-[#2C2C2C] dark:text-white font-medium">Tokens</TableHead>
-                    <TableHead className="text-[#2C2C2C] dark:text-white font-medium">Cost</TableHead>
-                    <TableHead className="text-[#2C2C2C] dark:text-white font-medium">Date</TableHead>
+                  <TableRow className="border-zinc-200 dark:border-zinc-800">
+                    <TableHead className="text-zinc-900 dark:text-white font-medium">Conversation</TableHead>
+                    <TableHead className="text-zinc-900 dark:text-white font-medium">Model</TableHead>
+                    <TableHead className="text-zinc-900 dark:text-white font-medium">Messages</TableHead>
+                    <TableHead className="text-zinc-900 dark:text-white font-medium">Tokens</TableHead>
+                    <TableHead className="text-zinc-900 dark:text-white font-medium">Cost</TableHead>
+                    <TableHead className="text-zinc-900 dark:text-white font-medium">Date</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {recentConversations.map((conversation) => (
                     <TableRow
                       key={conversation.id}
-                      className="border-[#EAE8E2] dark:border-gray-700 hover:bg-[#F8F6F2] dark:hover:bg-gray-700/50"
+                      className="border-zinc-200 dark:border-zinc-800 hover:bg-white dark:hover:bg-zinc-700/50"
                     >
                       <TableCell>
                         <div>
-                          <div className="font-medium text-[#2C2C2C] dark:text-white">{conversation.title}</div>
-                          <div className="text-sm text-[#7A7A7A] dark:text-gray-400">ID: {conversation.id}</div>
+                          <div className="font-medium text-zinc-900 dark:text-white">{conversation.title}</div>
+                          <div className="text-sm text-zinc-500 dark:text-zinc-400">ID: {conversation.id}</div>
                         </div>
                       </TableCell>
                       <TableCell>
                         <Badge
                           variant="secondary"
-                          className="bg-[#EAE8E2] dark:bg-gray-700 text-[#2C2C2C] dark:text-white hover:bg-[#EAE8E2] dark:hover:bg-gray-700"
+                          className="bg-zinc-200 dark:bg-zinc-800 text-zinc-900 dark:text-white hover:bg-zinc-200 dark:hover:bg-zinc-700"
                         >
                           {conversation.model}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-[#2C2C2C] dark:text-white">{conversation.messages}</TableCell>
-                      <TableCell className="text-[#2C2C2C] dark:text-white">
+                      <TableCell className="text-zinc-900 dark:text-white">{conversation.messages}</TableCell>
+                      <TableCell className="text-zinc-900 dark:text-white">
                         {conversation.tokens.toLocaleString()}
                       </TableCell>
-                      <TableCell className="text-[#2C2C2C] dark:text-white">${conversation.cost.toFixed(2)}</TableCell>
+                      <TableCell className="text-zinc-900 dark:text-white">${conversation.cost.toFixed(2)}</TableCell>
                       <TableCell>
-                        <div className="text-[#2C2C2C] dark:text-white">
+                        <div className="text-zinc-900 dark:text-white">
                           <div className="flex items-center gap-1">
-                            <Calendar className="size-3 text-[#7A7A7A] dark:text-gray-400" />
+                            <Calendar className="size-3 text-zinc-500 dark:text-zinc-400" />
                             {conversation.date}
                           </div>
-                          <div className="flex items-center gap-1 text-sm text-[#7A7A7A] dark:text-gray-400">
+                          <div className="flex items-center gap-1 text-sm text-zinc-500 dark:text-zinc-400">
                             <Clock className="size-3" />
                             {conversation.time}
                           </div>

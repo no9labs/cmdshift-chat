@@ -139,11 +139,11 @@ export function LoginContent() {
       <div className="absolute top-4 right-4">
         <ThemeToggle />
       </div>
-      <Card className="w-full max-w-md bg-white dark:bg-gray-800 border-[#EAE8E2] dark:border-gray-700 shadow-lg hover:border-[#3A4D6F]/20 dark:hover:border-[#3A4D6F]/30 transition-colors duration-200">
+      <Card className="w-full max-w-md bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 shadow-lg hover:border-[#3A4D6F]/20 dark:hover:border-[#3A4D6F]/30 transition-colors duration-200">
         <CardHeader className="text-center pb-6">
           {/* Logo */}
           <div className="flex justify-center mb-6">
-            <div className="bg-[#3A4D6F] rounded-xl p-3 shadow-sm">
+            <div className="bg-zinc-900 rounded-xl p-3 shadow-sm">
               <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path
                   d="M9 9V15M15 9V15M9 12H15M17 19H7C4.79086 19 3 17.2091 3 15V9C3 6.79086 4.79086 5 7 5H17C19.2091 5 21 6.79086 21 9V15C21 17.2091 19.2091 19 17 19Z"
@@ -156,8 +156,8 @@ export function LoginContent() {
             </div>
           </div>
 
-          <CardTitle className="text-2xl font-semibold text-[#2C2C2C] dark:text-white mb-2">Welcome back</CardTitle>
-          <CardDescription className="text-[#7A7A7A] dark:text-gray-400">
+          <CardTitle className="text-2xl font-semibold text-zinc-900 dark:text-white mb-2">Welcome back</CardTitle>
+          <CardDescription className="text-zinc-500 dark:text-zinc-400">
             Sign in to your CmdShift account to continue
           </CardDescription>
         </CardHeader>
@@ -186,18 +186,18 @@ export function LoginContent() {
           <form onSubmit={handleLogin} className="space-y-4">
             {/* Email Field */}
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-sm font-medium text-[#2C2C2C] dark:text-white">
+              <Label htmlFor="email" className="text-sm font-medium text-zinc-900 dark:text-white">
                 Email address
               </Label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 size-4 text-[#7A7A7A] dark:text-gray-400" />
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 size-4 text-zinc-500 dark:text-zinc-400" />
                 <Input
                   id="email"
                   type="email"
                   placeholder="Enter your email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="pl-10 border-[#EAE8E2] dark:border-gray-600 focus:border-[#3A4D6F] focus:ring-1 focus:ring-[#3A4D6F] bg-white dark:bg-gray-700 text-[#2C2C2C] dark:text-white shadow-none focus:shadow-none"
+                  className="pl-10 border-zinc-200 dark:border-zinc-600 focus:border-[#3A4D6F] focus:ring-1 focus:ring-[#3A4D6F] bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-none focus:shadow-none"
                   required
                 />
               </div>
@@ -205,24 +205,24 @@ export function LoginContent() {
 
             {/* Password Field */}
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-sm font-medium text-[#2C2C2C] dark:text-white">
+              <Label htmlFor="password" className="text-sm font-medium text-zinc-900 dark:text-white">
                 Password
               </Label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 size-4 text-[#7A7A7A] dark:text-gray-400" />
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 size-4 text-zinc-500 dark:text-zinc-400" />
                 <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
                   placeholder="Enter your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="pl-10 pr-10 border-[#EAE8E2] dark:border-gray-600 focus:border-[#3A4D6F] focus:ring-1 focus:ring-[#3A4D6F] bg-white dark:bg-gray-700 text-[#2C2C2C] dark:text-white shadow-none focus:shadow-none"
+                  className="pl-10 pr-10 border-zinc-200 dark:border-zinc-600 focus:border-[#3A4D6F] focus:ring-1 focus:ring-[#3A4D6F] bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-none focus:shadow-none"
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#7A7A7A] dark:text-gray-400 hover:text-[#2C2C2C] dark:hover:text-white transition-colors"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors"
                 >
                   {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
                 </button>
@@ -235,9 +235,9 @@ export function LoginContent() {
                 id="remember"
                 checked={rememberMe}
                 onCheckedChange={(checked) => setRememberMe(checked as boolean)}
-                className="border-[#EAE8E2] dark:border-gray-600 data-[state=checked]:bg-[#3A4D6F] data-[state=checked]:border-[#3A4D6F]"
+                className="border-zinc-200 dark:border-zinc-600 data-[state=checked]:bg-zinc-900 data-[state=checked]:border-[#3A4D6F]"
               />
-              <Label htmlFor="remember" className="text-sm text-[#2C2C2C] dark:text-white cursor-pointer select-none">
+              <Label htmlFor="remember" className="text-sm text-zinc-900 dark:text-white cursor-pointer select-none">
                 Remember me for 30 days
               </Label>
             </div>
@@ -246,7 +246,7 @@ export function LoginContent() {
             <Button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-[#3A4D6F] hover:bg-[#3A4D6F]/90 text-white font-medium py-3 transition-all duration-200"
+              className="w-full bg-zinc-900 hover:bg-zinc-900/90 text-white font-medium py-3 transition-all duration-200"
             >
               {isLoading ? (
                 <div className="flex items-center gap-2">
@@ -264,15 +264,15 @@ export function LoginContent() {
 
           {/* Divider */}
           <div className="relative">
-            <Separator className="bg-[#EAE8E2] dark:bg-gray-700" />
+            <Separator className="bg-zinc-200 dark:bg-zinc-800" />
             <div className="absolute inset-0 flex justify-center">
-              <span className="bg-white dark:bg-gray-800 px-3 text-sm text-[#7A7A7A] dark:text-gray-400">OR</span>
+              <span className="bg-white dark:bg-zinc-950 px-3 text-sm text-zinc-500 dark:text-zinc-400">OR</span>
             </div>
           </div>
 
           {/* Social Login Grid */}
           <div className="space-y-3">
-            <p className="text-sm text-[#7A7A7A] dark:text-gray-400 text-center">Continue with</p>
+            <p className="text-sm text-zinc-500 dark:text-zinc-400 text-center">Continue with</p>
             <div className="grid grid-cols-2 gap-3">
               {socialProviders.map((provider) => {
                 const IconComponent = provider.icon
@@ -281,7 +281,7 @@ export function LoginContent() {
                     key={provider.name}
                     variant="outline"
                     onClick={() => handleSocialLogin(provider.name)}
-                    className={`border-[#EAE8E2] dark:border-gray-600 bg-white dark:bg-gray-700 text-[#2C2C2C] dark:text-white transition-all duration-200 ${provider.color}`}
+                    className={`border-zinc-200 dark:border-zinc-600 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white transition-all duration-200 ${provider.color}`}
                   >
                     <IconComponent className={`size-4 mr-2 ${provider.iconColor}`} />
                     {provider.name}
@@ -292,9 +292,9 @@ export function LoginContent() {
           </div>
 
           {/* Security Notice */}
-          <div className="flex items-center gap-2 p-3 bg-[#3A4D6F]/5 dark:bg-[#3A4D6F]/10 rounded-lg border border-[#3A4D6F]/20 dark:border-[#3A4D6F]/30">
-            <Shield className="size-4 text-[#3A4D6F] flex-shrink-0" />
-            <p className="text-xs text-[#2C2C2C] dark:text-white">
+          <div className="flex items-center gap-2 p-3 bg-zinc-900/5 dark:bg-zinc-900/10 rounded-lg border border-[#3A4D6F]/20 dark:border-[#3A4D6F]/30">
+            <Shield className="size-4 text-zinc-900 flex-shrink-0" />
+            <p className="text-xs text-zinc-900 dark:text-white">
               Your login is secured with enterprise-grade encryption
             </p>
           </div>
@@ -304,18 +304,18 @@ export function LoginContent() {
             <div className="text-center">
               <Link
                 href="/forgot-password"
-                className="text-sm text-[#3A4D6F] hover:text-[#3A4D6F]/80 font-medium transition-colors"
+                className="text-sm text-zinc-900 hover:text-zinc-900/80 font-medium transition-colors"
               >
                 Forgot your password?
               </Link>
             </div>
 
-            <Separator className="bg-[#EAE8E2] dark:bg-gray-700" />
+            <Separator className="bg-zinc-200 dark:bg-zinc-800" />
 
             <div className="text-center">
-              <p className="text-sm text-[#7A7A7A] dark:text-gray-400">
+              <p className="text-sm text-zinc-500 dark:text-zinc-400">
                 Don't have an account?{" "}
-                <Link href="/signup" className="text-[#3A4D6F] hover:text-[#3A4D6F]/80 font-medium transition-colors">
+                <Link href="/signup" className="text-zinc-900 hover:text-zinc-900/80 font-medium transition-colors">
                   Sign up for free
                 </Link>
               </p>

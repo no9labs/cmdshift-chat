@@ -2,15 +2,16 @@
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
-import { Mail, Lock, Eye, EyeOff, GalleryVerticalEnd, Loader2 } from "lucide-react"
+import { Mail, Lock, Eye, EyeOff, Loader2 } from "lucide-react"
 import { useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { MagicCard } from "@/components/magicui/magic-card"
 
 export function LoginForm({
   className,
@@ -97,26 +98,29 @@ export function LoginForm({
   
   return (
     <div className={cn("w-full max-w-md", className)} {...props}>
-      <Card className="border-[#EAE8E2] dark:border-slate-800 bg-white dark:bg-slate-900/50 dark:backdrop-blur shadow-2xl">
-        <CardHeader className="text-center pb-6">
-          <CardTitle className="text-2xl font-semibold text-[#2C2C2C] dark:text-white">Welcome back</CardTitle>
-          <CardDescription className="text-[#7A7A7A] dark:text-slate-400">
-            Enter your email below to sign in to your account
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
+      <MagicCard 
+        className="rounded-xl border border-border shadow-2xl"
+      >
+        <div className="rounded-xl p-6">
+          <div className="text-center pb-6">
+            <h2 className="text-2xl font-semibold text-foreground">Welcome back</h2>
+            <p className="text-muted-foreground mt-2">
+              Enter your email below to sign in to your account
+            </p>
+          </div>
+          <div className="space-y-6">
           {error && (
-            <Alert className="bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800">
-              <AlertDescription className="text-red-800 dark:text-red-300">
+            <Alert className="bg-destructive/10 border-destructive/20">
+              <AlertDescription className="text-destructive">
                 {error}
               </AlertDescription>
             </Alert>
           )}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-sm font-medium text-[#2C2C2C] dark:text-slate-200">Email</Label>
+              <Label htmlFor="email" className="text-sm font-medium text-foreground">Email</Label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 size-4 text-[#7A7A7A] dark:text-slate-500" />
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 size-4 text-muted-foreground" />
                 <Input 
                   id="email" 
                   type="email" 
@@ -125,22 +129,22 @@ export function LoginForm({
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   disabled={isLoading}
-                  className="pl-10 border-[#EAE8E2] dark:border-slate-700 bg-white dark:bg-slate-800/50 text-[#2C2C2C] dark:text-white placeholder:text-[#7A7A7A] dark:placeholder:text-slate-500 focus:border-[#3A4D6F] focus:ring-1 focus:ring-[#3A4D6F] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="pl-10 border-input bg-background text-foreground placeholder:text-muted-foreground focus:border-ring focus:ring-1 focus:ring-ring transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 />
               </div>
             </div>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="password" className="text-sm font-medium text-[#2C2C2C] dark:text-slate-200">Password</Label>
+                <Label htmlFor="password" className="text-sm font-medium text-foreground">Password</Label>
                 <a
                   href="/forgot-password"
-                  className="text-sm text-[#7A7A7A] dark:text-slate-400 hover:text-[#3A4D6F] dark:hover:text-[#3A4D6F] transition-colors duration-200"
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors duration-200"
                 >
                   Forgot password?
                 </a>
               </div>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 size-4 text-[#7A7A7A] dark:text-slate-500" />
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 size-4 text-muted-foreground" />
                 <Input 
                   id="password" 
                   type={showPassword ? "text" : "password"}
@@ -149,12 +153,12 @@ export function LoginForm({
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   disabled={isLoading}
-                  className="pl-10 pr-10 border-[#EAE8E2] dark:border-slate-700 bg-white dark:bg-slate-800/50 text-[#2C2C2C] dark:text-white placeholder:text-[#7A7A7A] dark:placeholder:text-slate-500 focus:border-[#3A4D6F] focus:ring-1 focus:ring-[#3A4D6F] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="pl-10 pr-10 border-input bg-background text-foreground placeholder:text-muted-foreground focus:border-ring focus:ring-1 focus:ring-ring transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#7A7A7A] dark:text-slate-500 hover:text-[#2C2C2C] dark:hover:text-slate-300 transition-colors"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                 >
                   {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
                 </button>
@@ -163,7 +167,7 @@ export function LoginForm({
             <Button 
               type="submit" 
               disabled={isLoading}
-              className="w-full bg-gradient-to-r from-[#3A4D6F] to-[#2A3D5F] hover:from-[#2A3D5F] hover:to-[#1A2D4F] text-white font-medium py-2.5 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium py-2.5 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? (
                 <>
@@ -177,10 +181,10 @@ export function LoginForm({
             
             <div className="relative my-6">
               <div className="absolute inset-0 flex items-center">
-                <Separator className="w-full bg-[#EAE8E2] dark:bg-slate-700" />
+                <Separator className="w-full bg-border" />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-white dark:bg-slate-900/50 dark:backdrop-blur px-3 text-[#7A7A7A] dark:text-slate-500">Or continue with</span>
+                <span className="bg-background px-3 text-muted-foreground">Or continue with</span>
               </div>
             </div>
             
@@ -190,7 +194,7 @@ export function LoginForm({
                 variant="outline" 
                 onClick={handleGoogleSignIn}
                 disabled={isLoading}
-                className="border-[#EAE8E2] dark:border-slate-700 bg-white dark:bg-slate-800/50 text-[#2C2C2C] dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700 hover:text-[#2C2C2C] dark:hover:text-white hover:border-gray-200 dark:hover:border-slate-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="border-border bg-background text-foreground hover:bg-accent hover:text-accent-foreground hover:border-accent transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <svg className="size-4 mr-2" viewBox="0 0 24 24">
                   <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -205,7 +209,7 @@ export function LoginForm({
                 variant="outline" 
                 onClick={handleGithubSignIn}
                 disabled={isLoading}
-                className="border-[#EAE8E2] dark:border-slate-700 bg-white dark:bg-slate-800/50 text-[#2C2C2C] dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700 hover:text-[#2C2C2C] dark:hover:text-white hover:border-gray-200 dark:hover:border-slate-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="border-border bg-background text-foreground hover:bg-accent hover:text-accent-foreground hover:border-accent transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <svg className="size-4 mr-2" viewBox="0 0 24 24">
                   <path fill="currentColor" d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
@@ -215,16 +219,17 @@ export function LoginForm({
             </div>
             
             <div className="text-center pt-2">
-              <p className="text-sm text-[#7A7A7A] dark:text-slate-400">
+              <p className="text-sm text-muted-foreground">
                 Don't have an account?{" "}
-                <a href="/signup" className="text-[#3A4D6F] hover:text-[#3A4D6F]/80 font-medium transition-colors duration-200">
+                <Link href="/signup" className="text-foreground hover:text-foreground/80 font-medium transition-colors duration-200" prefetch>
                   Create account
-                </a>
+                </Link>
               </p>
             </div>
           </form>
-        </CardContent>
-      </Card>
+          </div>
+        </div>
+      </MagicCard>
     </div>
   )
 }
