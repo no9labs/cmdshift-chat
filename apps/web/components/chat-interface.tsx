@@ -19,6 +19,7 @@ import {
 import { Send, Bot, Plus, Settings, Check, ChevronsUpDown, Home } from "lucide-react"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { useConversations } from "@/contexts/conversations-context"
+import { useUser } from "@/lib/hooks/useUser"
 
 interface Message {
   id: string
@@ -45,6 +46,7 @@ export function ChatInterface({
   const scrollAreaRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement | HTMLInputElement>(null)
   const { conversations } = useConversations()
+  const { user } = useUser()
 
   const [selectedModel, setSelectedModel] = useState("Auto")
   const [modelOpen, setModelOpen] = useState(false)
@@ -90,11 +92,11 @@ export function ChatInterface({
   // Load conversation messages when conversation ID changes
   useEffect(() => {
     const loadConversation = async () => {
-      if (!conversationId) return
+      if (!conversationId || !user?.id) return
       
       try {
         // Load messages
-        const response = await fetch(`http://localhost:8001/api/v1/conversations/${conversationId}/messages?user_id=692a4738-5530-4627-8950-04d40d9b7d7e`)
+        const response = await fetch(`http://localhost:8001/api/v1/conversations/${conversationId}/messages?user_id=${user.id}`)
         
         if (response.ok) {
           const data = await response.json()
@@ -112,7 +114,7 @@ export function ChatInterface({
     }
     
     loadConversation()
-  }, [conversationId])
+  }, [conversationId, user?.id])
 
   const scrollToBottom = () => {
     if (scrollAreaRef.current) {
@@ -129,7 +131,7 @@ export function ChatInterface({
 
   const handleSendMessage = async () => {
     const inputMessage = inputValue
-    if (!inputMessage.trim()) return
+    if (!inputMessage.trim() || !user?.id) return
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -151,7 +153,7 @@ export function ChatInterface({
           messages: [...messages, userMessage],
           model: selectedModel.toLowerCase() === 'auto' ? 'auto' : selectedModel.toLowerCase(),
           conversation_id: conversationId,
-          user_id: "692a4738-5530-4627-8950-04d40d9b7d7e",  // Add this line
+          user_id: user.id,
           stream: true,
         }),
       })
@@ -229,7 +231,7 @@ export function ChatInterface({
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               conversation_id: targetConversationId,
-              user_id: "692a4738-5530-4627-8950-04d40d9b7d7e",
+              user_id: user.id,
               messages: [
                 { role: 'user', content: userMessage.content },
                 { role: 'assistant', content: assistantContent }

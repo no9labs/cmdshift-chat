@@ -1,6 +1,7 @@
 'use client'
 
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react'
+import { useUser } from '@/lib/hooks/useUser'
 
 interface Conversation {
   id: string
@@ -20,17 +21,22 @@ interface ConversationsContextType {
 
 const ConversationsContext = createContext<ConversationsContextType | undefined>(undefined)
 
-const USER_ID = '692a4738-5530-4627-8950-04d40d9b7d7e'
-
 export function ConversationsProvider({ children }: { children: ReactNode }) {
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const { user } = useUser()
 
   const fetchConversations = useCallback(async () => {
+    if (!user?.id) {
+      setConversations([])
+      setIsLoading(false)
+      return
+    }
+    
     setIsLoading(true)
     try {
       const response = await fetch(
-        `http://localhost:8001/api/v1/conversations/?user_id=${USER_ID}`
+        `http://localhost:8001/api/v1/conversations/?user_id=${user.id}`
       )
       const data = await response.json()
       
@@ -49,7 +55,7 @@ export function ConversationsProvider({ children }: { children: ReactNode }) {
     } finally {
       setIsLoading(false)
     }
-  }, [])
+  }, [user?.id])
 
   const updateConversationTitle = useCallback((id: string, title: string) => {
     setConversations(prev => {
@@ -90,8 +96,10 @@ export function ConversationsProvider({ children }: { children: ReactNode }) {
   }, [])
 
   useEffect(() => {
-    fetchConversations()
-  }, [fetchConversations])
+    if (user?.id) {
+      fetchConversations()
+    }
+  }, [fetchConversations, user?.id])
 
   return (
     <ConversationsContext.Provider 
