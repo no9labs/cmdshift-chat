@@ -1,14 +1,31 @@
-import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
+"use client"
 
-export default async function Home() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+import { Sidebar } from "@/components/sidebar"
+import { ChatInterface } from "@/components/chat-interface"
+import { ConversationsProvider, useConversations } from "@/contexts/conversations-context"
 
-  if (!user) {
-    redirect('/login')
-  }
+function HomeContent() {
+  const { addConversation, updateConversationTitle } = useConversations()
+  const conversationId = `conv_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`
 
-  // Redirect to new chat
-  redirect('/chat/new')
+  return (
+    <div className="flex h-screen bg-gray-50">
+      <Sidebar />
+      <main className="flex-1 flex flex-col">
+        <ChatInterface 
+          conversationId={conversationId}
+          onConversationCreated={addConversation}
+          onTitleGenerated={updateConversationTitle}
+        />
+      </main>
+    </div>
+  )
+}
+
+export default function Home() {
+  return (
+    <ConversationsProvider>
+      <HomeContent />
+    </ConversationsProvider>
+  )
 }

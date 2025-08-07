@@ -103,9 +103,16 @@ class BaseProvider(ABC):
             json=payload,
             headers=self.get_auth_headers()
         )
+        
+        print(f"[DEBUG {self.config.name.upper()}] Raw API response status: {response.status_code}")
+        print(f"[DEBUG {self.config.name.upper()}] Raw API response headers: {dict(response.headers)}")
+        
         response.raise_for_status()
         
-        return self.parse_response(response.json())
+        response_json = response.json()
+        print(f"[DEBUG {self.config.name.upper()}] Raw API response JSON: {json.dumps(response_json, indent=2)}")
+        
+        return self.parse_response(response_json)
     
     async def stream(
         self,

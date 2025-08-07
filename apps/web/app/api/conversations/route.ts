@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
     // Transform backend format to frontend format
     const conversations = data.conversations.map((conv: any) => ({
       id: conv.id,
-      title: conv.last_message?.substring(0, 50) + '...' || 'New Conversation',
+      title: conv.title || conv.last_message?.substring(0, 50) + '...' || 'New Conversation',
       createdAt: conv.timestamp || new Date().toISOString(),
       preview: conv.last_message || ''
     }));

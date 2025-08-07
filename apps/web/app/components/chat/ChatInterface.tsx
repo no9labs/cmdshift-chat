@@ -2,11 +2,12 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { MessageList } from './MessageList';
-import { InputArea } from './InputArea';
+import { ModelSelector } from './ModelSelector';
 import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Bot } from 'lucide-react';
+import { Bot, Send } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
 
 // Extend Window interface to include refreshConversations
 declare global {
@@ -29,10 +30,13 @@ interface ChatInterfaceProps {
 export function ChatInterface({ conversationId = 'new' }: ChatInterfaceProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedModel, setSelectedModel] = useState('auto');
   const [userId, setUserId] = useState<string>('anonymous');
+  const [input, setInput] = useState('');
+  const [selectedModel, setSelectedModel] = useState('auto');
   const streamingMessageRef = useRef<string>('');
   const [currentStreamingMessageId, setCurrentStreamingMessageId] = useState<string | null>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // Get the authenticated user
@@ -46,11 +50,24 @@ export function ChatInterface({ conversationId = 'new' }: ChatInterfaceProps) {
     getUserId();
   }, []);
 
+  // Auto-resize textarea
+  useEffect(() => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+    
+    textarea.style.height = 'auto';
+    textarea.style.height = Math.min(textarea.scrollHeight, 200) + 'px';
+  }, [input]);
+
+  // Auto-scroll to bottom
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
   useEffect(() => {
     // Load conversation if not new
     if (conversationId !== 'new') {
-      // TODO: Load conversation messages from Redis/DB
-      console.log('Loading conversation:', conversationId);
+      // Load conversation messages from Redis/DB
     }
   }, [conversationId]);
 
@@ -61,9 +78,7 @@ export function ChatInterface({ conversationId = 'new' }: ChatInterfaceProps) {
       
       setIsLoading(true);
       try {
-        console.log('Loading conversation:', conversationId);
         const response = await fetch(`/web-api/conversations/${conversationId}/messages`);
-        console.log('Response status:', response.status);
         if (response.ok) {
           const data = await response.json();
           const formattedMessages = (data.messages || []).map((msg: any) => ({
@@ -86,7 +101,11 @@ export function ChatInterface({ conversationId = 'new' }: ChatInterfaceProps) {
     loadConversation();
   }, [conversationId, userId]);
 
-  const sendMessage = async (content: string) => {
+  const handleSubmit = async (e?: React.FormEvent) => {
+    e?.preventDefault();
+    if (!input.trim() || isLoading) return;
+
+    const content = input.trim();
     const userMessage: Message = {
       id: Date.now().toString(),
       role: 'user',
@@ -94,11 +113,19 @@ export function ChatInterface({ conversationId = 'new' }: ChatInterfaceProps) {
     };
 
     setMessages(prev => [...prev, userMessage]);
+    setInput('');
     setIsLoading(true);
+    
+    // Reset textarea height
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+    }
 
     let response: Response | null = null;
+    const currentMessage = content; // Store for use in finally block
+    let newConversationId: string | null = null;
     try {
-      response = await fetch('http://localhost:8001/api/v1/completions', {
+      response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/completions`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -117,6 +144,13 @@ export function ChatInterface({ conversationId = 'new' }: ChatInterfaceProps) {
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      // Capture conversation ID from response headers (for both streaming and non-streaming)
+      const convIdHeader = response.headers.get('X-Conversation-Id');
+      
+      if (convIdHeader) {
+        newConversationId = convIdHeader;
       }
 
       const reader = response.body?.getReader();
@@ -181,7 +215,7 @@ export function ChatInterface({ conversationId = 'new' }: ChatInterfaceProps) {
                   }
                 });
               }
-            } catch (e) {
+            } catch (e: unknown) {
               console.error('Error parsing SSE data:', e);
             }
           }
@@ -197,96 +231,142 @@ export function ChatInterface({ conversationId = 'new' }: ChatInterfaceProps) {
     } finally {
       setIsLoading(false);
       
-      // If this was a new conversation, update the URL with the generated ID
-      if (conversationId === 'new' && response) {
-        const returnedConversationId = response.headers.get('X-Conversation-Id');
-        if (returnedConversationId) {
-          // Update URL without full page reload
-          window.history.replaceState({}, '', `/chat/${returnedConversationId}`);
+      // Get the full response from the streaming message
+      const fullResponse = streamingMessageRef.current;
+      
+      // If this was a new conversation, update the URL and generate title
+      // Check if this is first message exchange
+      if (newConversationId && messages.length === 0 && fullResponse) {
+        // Update URL without full page reload
+        window.history.replaceState({}, '', `/chat/${newConversationId}`);
+        
+        // Generate title for new conversations
+        
+        // Call backend to generate and save title
+        try {
+          const titleResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/conversations/generate-title`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              conversation_id: newConversationId,
+              user_id: userId,
+              messages: [
+                { role: 'user', content: currentMessage },
+                { role: 'assistant', content: fullResponse }
+              ]
+            })
+          });
           
-          // Refresh conversations in sidebar with a small delay
-          if (window.refreshConversations) {
+          if (titleResponse.ok) {
+            // Give backend time to save title to Redis before refreshing
             setTimeout(() => {
-              window.refreshConversations();
-            }, 1000); // 1 second delay to ensure backend has saved the message
+              if (window.refreshConversations) {
+                window.refreshConversations();
+                
+                // Retry once more after another delay if needed
+                setTimeout(() => {
+                  if (window.refreshConversations) {
+                    window.refreshConversations();
+                  }
+                }, 2000);
+              }
+            }, 2000); // Initial 2-second delay
           }
+        } catch (error) {
+          console.error('Failed to generate title:', error);
         }
       }
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+      e.preventDefault();
+      handleSubmit();
+    }
+  };
+
   return (
-    <div className="flex flex-col h-screen bg-background">
-      {/* Enhanced Header */}
-      <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-14 items-center px-4">
-          <div className="flex items-center gap-2 mr-auto">
-            <Bot className="h-5 w-5 text-primary" />
-            <h1 className="text-lg font-semibold">Chat</h1>
-            <Badge variant="secondary" className="text-xs">Beta</Badge>
-          </div>
-          
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground mr-2">Model:</span>
-            <select
-              value={selectedModel}
-              onChange={(e) => setSelectedModel(e.target.value)}
-              className="h-8 rounded-md border border-input bg-background px-3 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-            >
-              <option value="auto">Auto (Smart Routing)</option>
-              <option value="deepseek">DeepSeek (Best for Code)</option>
-              <option value="glm">GLM-4.5 (Fast & Cheap)</option>
-              <option value="qwen">Qwen (Complex Tasks)</option>
-            </select>
-          </div>
-        </div>
-      </header>
+    <div className="flex flex-col h-full bg-white">{/* Changed from h-screen to h-full since parent controls height */}
       
       {/* Messages Area with Loading State */}
-      {messages.length === 0 ? (
-        <div className="flex-1 flex items-center justify-center">
-          <div className="text-center space-y-4 max-w-md">
-            <Bot className="h-12 w-12 text-muted-foreground mx-auto" />
-            <div className="space-y-2">
-              <h2 className="text-xl font-semibold">Welcome to CmdShift</h2>
-              <p className="text-muted-foreground">
-                Start a conversation with AI that never limits you. I can help with coding, 
-                analysis, creative writing, and more.
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-2 justify-center">
-              <Badge variant="outline">No Rate Limits</Badge>
-              <Badge variant="outline">Smart Model Routing</Badge>
-              <Badge variant="outline">Persistent Memory</Badge>
-            </div>
-          </div>
-        </div>
-      ) : (
-        <MessageList messages={messages} className="flex-1 overflow-y-auto" />
-      )}
-      
-      {/* Loading Skeleton for Streaming */}
-      {isLoading && currentStreamingMessageId && !messages.find(m => m.id === currentStreamingMessageId) && (
-        <div className="mx-auto max-w-3xl px-4 py-6">
-          <div className="flex gap-4">
-            <Skeleton className="h-8 w-8 rounded-full shrink-0" />
-            <div className="flex-1 space-y-2">
-              <Skeleton className="h-4 w-20" />
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-3/4" />
+      <div className="flex-1 overflow-y-auto">
+        {messages.length === 0 ? (
+          <div className="h-full flex items-center justify-center p-4">
+            <div className="text-center space-y-6 max-w-lg">
+              <div className="bg-white w-16 h-16 rounded-2xl flex items-center justify-center mx-auto shadow-sm">
+                <Bot className="h-8 w-8 text-[#3A4D6F]" />
+              </div>
+              <div className="space-y-3">
+                <h2 className="text-2xl font-semibold text-[#2C2C2C]">
+                  Welcome to CmdShift
+                </h2>
+                <p className="text-base text-[#7A7A7A] leading-relaxed">
+                  Start a conversation with AI that never limits you. I can help with coding, 
+                  analysis, creative writing, and more.
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-3 justify-center">
+                <Badge variant="secondary" className="text-xs bg-white/50 border-[#3A4D6F]/20 text-[#3A4D6F]">
+                  No Rate Limits
+                </Badge>
+                <Badge variant="secondary" className="text-xs bg-white/50 border-[#3A4D6F]/20 text-[#3A4D6F]">
+                  Smart Model Routing
+                </Badge>
+                <Badge variant="secondary" className="text-xs bg-white/50 border-[#3A4D6F]/20 text-[#3A4D6F]">
+                  Persistent Memory
+                </Badge>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        ) : (
+          <>
+            <MessageList messages={messages} />
+            <div ref={messagesEndRef} />
+          </>
+        )}
+      </div>
       
       {/* Input Area */}
-      <InputArea
-        onSendMessage={sendMessage}
-        disabled={isLoading}
-        placeholder="Message CmdShift..."
-      />
+      <div className="p-4 md:p-6">
+        <div className="max-w-3xl mx-auto">
+          {/* Model Selector */}
+          <div className="mb-3 flex justify-end">
+            <ModelSelector 
+              value={selectedModel} 
+              onChange={setSelectedModel}
+              className="bg-white border-[#EAE8E2] text-sm"
+            />
+          </div>
+          
+          {/* Input Form */}
+          <form onSubmit={handleSubmit} className="relative">
+            <Textarea
+              ref={textareaRef}
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="Ask me anything..."
+              className="w-full bg-white rounded-lg shadow-sm p-4 pr-16 resize-none border-0 focus:outline-none focus:ring-2 focus:ring-[#3A4D6F] text-[#2C2C2C] placeholder-[#7A7A7A] min-h-[56px]"
+              rows={1}
+              disabled={isLoading}
+            />
+            
+            <Button
+              type="submit"
+              size="icon"
+              disabled={!input.trim() || isLoading}
+              className="absolute right-3 bottom-3 bg-[#3A4D6F] hover:bg-[#3A4D6F]/90 disabled:opacity-50 disabled:cursor-not-allowed h-8 w-8"
+            >
+              <Send className="h-4 w-4" />
+            </Button>
+          </form>
+          
+          <p className="text-center text-xs text-[#7A7A7A] mt-2">
+            CmdShift can make mistakes. Consider checking important information.
+          </p>
+        </div>
+      </div>
     </div>
   );
 }

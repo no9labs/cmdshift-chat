@@ -1,18 +1,21 @@
-import { ChatInterface } from '../../components/chat/ChatInterface';
+'use client'
 
-interface ChatPageProps {
-  params: Promise<{ id: string }>;
-}
+import { ChatInterface } from '@/components/chat-interface'
+import { useParams } from 'next/navigation'
+import { useConversations } from '@/contexts/conversations-context'
 
-export default async function ChatPage({ params }: ChatPageProps) {
-  const { id } = await params;
+export default function ChatPage() {
+  const params = useParams()
+  const conversationId = params.id as string
+  const { updateConversationTitle, addConversation } = useConversations()  // Add addConversation here
   
-  // If id is "new", just show empty chat
-  if (id === "new") {
-    return <ChatInterface conversationId="new" />;
-  }
-  
-  // For existing conversations, we'll load them later
-  // For now, just show the chat interface with the ID
-  return <ChatInterface conversationId={id} />;
+  return (
+    <div className="h-full">
+      <ChatInterface 
+        conversationId={conversationId} 
+        onTitleGenerated={updateConversationTitle}
+        onConversationCreated={addConversation}  // Add this new prop
+      />
+    </div>
+  )
 }

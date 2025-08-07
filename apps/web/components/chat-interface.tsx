@@ -1,0 +1,569 @@
+"use client"
+
+import type React from "react"
+import { useState, useRef, useEffect } from "react"
+import Image from "next/image"
+import { ShineBorder } from "@/components/magicui/shine-border"
+import { Meteors } from "@/components/magicui/meteors"
+import { Button } from "@/components/ui/button"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
+import { Send, Bot, Plus, Settings, Check, ChevronsUpDown, Home } from "lucide-react"
+import { ThemeToggle } from "@/components/theme-toggle"
+import { useConversations } from "@/contexts/conversations-context"
+import { useUser } from "@/lib/hooks/useUser"
+
+interface Message {
+  id: string
+  content: string
+  role: "user" | "assistant"
+  timestamp?: Date
+}
+
+interface ChatInterfaceProps {
+  conversationId?: string
+  onTitleGenerated?: (id: string, title: string) => void
+  onConversationCreated?: (conversation: any) => void  // Add this line
+}
+
+export function ChatInterface({ 
+  conversationId, 
+  onTitleGenerated,
+  onConversationCreated  // Add this parameter
+}: ChatInterfaceProps) {
+  const [messages, setMessages] = useState<Message[]>([])
+  const [inputValue, setInputValue] = useState("")
+  const [isStreaming, setIsStreaming] = useState(false)
+  const [conversationTitle, setConversationTitle] = useState<string>("New Chat")
+  const scrollAreaRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLTextAreaElement | HTMLInputElement>(null)
+  const { conversations } = useConversations()
+  const { user } = useUser()
+
+  const [selectedModel, setSelectedModel] = useState("Auto")
+  const [modelOpen, setModelOpen] = useState(false)
+  const [logoSrc, setLogoSrc] = useState("/cmd-logo-no-padding.svg")
+
+  const models = [
+    { value: "auto", label: "Auto" },
+    { value: "deepseek", label: "Deepseek" },
+    { value: "glm", label: "GLM" },
+    { value: "qwen", label: "Qwen" },
+  ]
+
+  // Update logo based on theme
+  useEffect(() => {
+    const updateLogo = () => {
+      const root = window.document.documentElement
+      const isDark = root.classList.contains('dark')
+      setLogoSrc(isDark ? "/cmd-logo-no-padding.svg" : "/cmd-logo-inverted.svg")
+    }
+
+    updateLogo()
+    
+    // Watch for theme changes
+    const observer = new MutationObserver(updateLogo)
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class']
+    })
+
+    return () => observer.disconnect()
+  }, [])
+
+  // Update title when conversation changes or conversations list updates
+  useEffect(() => {
+    if (conversationId && conversations.length > 0) {
+      const conversation = conversations.find(c => c.id === conversationId)
+      if (conversation && conversation.title) {
+        setConversationTitle(conversation.title)
+      }
+    }
+  }, [conversationId, conversations])
+
+  // Load conversation messages when conversation ID changes
+  useEffect(() => {
+    const loadConversation = async () => {
+      if (!conversationId || !user?.id) return
+      
+      try {
+        // Load messages
+        const response = await fetch(`http://localhost:8001/api/v1/conversations/${conversationId}/messages?user_id=${user.id}`)
+        
+        if (response.ok) {
+          const data = await response.json()
+          if (data.messages && data.messages.length > 0) {
+            setMessages(data.messages.map((msg: any) => ({
+              id: msg.id || Date.now().toString(),
+              role: msg.role,
+              content: msg.content
+            })))
+          }
+        }
+      } catch (error) {
+        console.error('Failed to load conversation:', error)
+      }
+    }
+    
+    loadConversation()
+  }, [conversationId, user?.id])
+
+  const scrollToBottom = () => {
+    if (scrollAreaRef.current) {
+      const scrollContainer = scrollAreaRef.current.querySelector("[data-radix-scroll-area-viewport]")
+      if (scrollContainer) {
+        scrollContainer.scrollTop = scrollContainer.scrollHeight
+      }
+    }
+  }
+
+  useEffect(() => {
+    scrollToBottom()
+  }, [messages])
+
+  const handleSendMessage = async () => {
+    const inputMessage = inputValue
+    if (!inputMessage.trim() || !user?.id) return
+
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      role: 'user',
+      content: inputMessage.trim(),
+    }
+
+    setMessages(prev => [...prev, userMessage])
+    setInputValue('')
+    setIsStreaming(true)
+
+    try {
+      const response = await fetch('http://localhost:8001/api/v1/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          messages: [...messages, userMessage],
+          model: selectedModel.toLowerCase() === 'auto' ? 'auto' : selectedModel.toLowerCase(),
+          conversation_id: conversationId,
+          user_id: user.id,
+          stream: true,
+        }),
+      })
+
+      if (!response.ok) throw new Error('Failed to send message')
+
+      // Check for new conversation ID in response headers
+      let newConversationId: string | null = null
+      const conversationHeader = response.headers.get('X-Conversation-Id')
+      
+      if (conversationHeader) {
+        newConversationId = conversationHeader
+        
+        // Add the new conversation to state
+        if (onConversationCreated && newConversationId) {
+          const newConversation = {
+            id: newConversationId,
+            title: 'New Chat',  // Temporary title until AI generates one
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          }
+          onConversationCreated(newConversation)
+        }
+      }
+
+      const reader = response.body?.getReader()
+      const decoder = new TextDecoder()
+      
+      const assistantMessageId = (Date.now() + 1).toString()
+      let assistantContent = ''
+      
+      setMessages(prev => [...prev, {
+        id: assistantMessageId,
+        role: 'assistant',
+        content: '',
+      }])
+
+      while (true) {
+        const { done, value } = await reader!.read()
+        if (done) break
+        
+        const chunk = decoder.decode(value)
+        const lines = chunk.split('\n')
+        
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            try {
+              const data = JSON.parse(line.slice(6))
+              if (data.content) {
+                assistantContent += data.content
+                setMessages(prev => 
+                  prev.map(msg => 
+                    msg.id === assistantMessageId 
+                      ? { ...msg, content: assistantContent }
+                      : msg
+                  )
+                )
+              }
+            } catch (e) {
+              // Skip invalid JSON
+            }
+          }
+        }
+      }
+      
+      // After streaming completes - generate title for new conversation
+      if (messages.length === 0 && assistantContent) {
+        // Use the new conversation ID if one was created, otherwise use the existing one
+        const targetConversationId = newConversationId || conversationId
+        
+        // Generate title for new conversation
+        try {
+          const titleResponse = await fetch('http://localhost:8001/api/v1/conversations/generate-title', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              conversation_id: targetConversationId,
+              user_id: user.id,
+              messages: [
+                { role: 'user', content: userMessage.content },
+                { role: 'assistant', content: assistantContent }
+              ]
+            })
+          })
+          
+          if (titleResponse.ok) {
+            const titleData = await titleResponse.json()
+            
+            // Update local state
+            if (titleData.title) {
+              setConversationTitle(titleData.title)
+            }
+            
+            // Use the new updateConversationTitle method instead of onTitleGenerated
+            if (onTitleGenerated && titleData.title && targetConversationId) {
+              // Call the update method with the conversation ID and new title
+              onTitleGenerated(targetConversationId, titleData.title)
+            }
+          }
+        } catch (error) {
+          console.error('Failed to generate title:', error)
+        }
+      }
+    } catch (error) {
+      console.error('Error sending message:', error)
+    } finally {
+      setIsStreaming(false)
+    }
+  }
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault()
+      handleSendMessage()
+    }
+  }
+
+  const formatTime = (date: Date) => {
+    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+  }
+
+  const isNewChat = messages.length === 0
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (modelOpen && !(event.target as Element).closest(".relative")) {
+        setModelOpen(false)
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [modelOpen])
+
+  if (isNewChat) {
+    // Centered layout for new chat
+    return (
+      <div className="flex flex-col h-full bg-sidebar relative">
+        {/* Full-height card with meteors */}
+        <div className="absolute inset-6 bg-white dark:bg-black rounded-3xl border border-border/50 shadow-2xl overflow-hidden">
+          <Meteors number={20} />
+          
+          {/* Content inside the card */}
+          <div className="relative z-10 flex flex-col h-full">
+            {/* Chat Header */}
+            <div className="p-8 flex items-center justify-between">
+              <Breadcrumb>
+                <BreadcrumbList>
+                  <BreadcrumbItem>
+                    <BreadcrumbLink href="/" className="flex items-center gap-1">
+                      <Home className="h-4 w-4" />
+                      Home
+                    </BreadcrumbLink>
+                  </BreadcrumbItem>
+                  <BreadcrumbSeparator />
+                  <BreadcrumbItem>
+                    <BreadcrumbPage>New Chat</BreadcrumbPage>
+                  </BreadcrumbItem>
+                </BreadcrumbList>
+              </Breadcrumb>
+              <ThemeToggle />
+            </div>
+
+            {/* Centered Content */}
+            <div className="flex-1 flex flex-col items-center justify-center p-6">
+            <div className="max-w-2xl w-full space-y-8">
+            {/* Quote with Logo */}
+            <div className="text-center space-y-4">
+              <div className="flex items-center justify-center gap-3 mb-6">
+                <div className="relative w-10 h-10">
+                  <Image
+                    src={logoSrc}
+                    alt="CmdShift Logo"
+                    width={40}
+                    height={40}
+                    className="object-contain"
+                    priority
+                  />
+                </div>
+                <h1 className="text-2xl font-medium text-foreground">What's on your mind today?</h1>
+              </div>
+            </div>
+
+            {/* Centered Input */}
+            <div className="bg-card rounded-2xl p-1 shadow-sm border border-border focus-within:border-ring focus-within:ring-1 focus-within:ring-ring focus-within:shadow-none transition-colors relative">
+              <ShineBorder 
+                borderWidth={3}
+                duration={8}
+                shineColor={["#18ccfc", "#ff00ff", "#ffff00"]}
+                className="opacity-100"
+              />
+              <div className="relative">
+                <textarea
+                  ref={inputRef as React.RefObject<HTMLTextAreaElement>}
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  onKeyPress={handleKeyPress as any}
+                  placeholder="How can I help you today?"
+                  className="w-full bg-transparent border-none resize-none p-2 pl-3 focus:ring-0 focus:outline-none text-base text-card-foreground placeholder:text-muted-foreground shadow-none focus:shadow-none"
+                  rows={1}
+                  disabled={isStreaming}
+                />
+              </div>
+              <div className="flex items-center gap-2 mt-1 p-1">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-muted-foreground hover:bg-accent hover:text-accent-foreground rounded-lg"
+                >
+                  <Plus className="size-5" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-muted-foreground hover:bg-accent hover:text-accent-foreground rounded-lg"
+                >
+                  <Settings className="size-5" />
+                </Button>
+                <div className="flex-1"></div>
+                {/* Model Selector */}
+                <div className="relative">
+                  <Button
+                    variant="outline"
+                    onClick={() => setModelOpen(!modelOpen)}
+                    className="w-[120px] justify-between border-border text-foreground hover:bg-accent hover:text-accent-foreground bg-transparent text-sm shadow-none"
+                  >
+                    {selectedModel}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                  {modelOpen && (
+                    <div className="absolute top-full mt-1 w-[120px] bg-popover border border-border rounded-md overflow-hidden z-50">
+                      {models.map((model) => (
+                        <button
+                          key={model.value}
+                          onClick={() => {
+                            setSelectedModel(model.label)
+                            setModelOpen(false)
+                          }}
+                          className="w-full px-3 py-2 text-left text-sm text-popover-foreground hover:bg-accent hover:text-accent-foreground flex items-center gap-2"
+                        >
+                          <Check className={`h-4 w-4 ${selectedModel === model.label ? "opacity-100" : "opacity-0"}`} />
+                          {model.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <Button
+                  onClick={handleSendMessage}
+                  disabled={!inputValue.trim() || isStreaming}
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground size-10 p-0 rounded-lg shadow-sm"
+                >
+                  <Send className="size-5" />
+                </Button>
+              </div>
+            </div>
+            </div>
+          </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Normal chat layout with messages
+  return (
+    <div className="flex flex-col h-full bg-sidebar relative">
+      {/* Full-height card with meteors */}
+      <div className="absolute inset-6 bg-white dark:bg-black rounded-3xl border border-border/50 shadow-2xl overflow-hidden">
+        <Meteors number={20} />
+        
+        {/* Content inside the card */}
+        <div className="relative z-10 flex flex-col h-full">
+          {/* Chat Header */}
+          <div className="p-8 flex items-center justify-between">
+            <Breadcrumb>
+              <BreadcrumbList>
+                <BreadcrumbItem>
+                  <BreadcrumbLink href="/" className="flex items-center gap-1">
+                    <Home className="h-4 w-4" />
+                    Home
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbPage>
+                    {conversationTitle}
+                  </BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
+            <ThemeToggle />
+          </div>
+
+          {/* Messages Area */}
+          <ScrollArea ref={scrollAreaRef} className="flex-1 px-8 overflow-y-auto">
+            <div className="space-y-6 max-w-4xl mx-auto">
+              {messages.map((message, index) => (
+                <div key={`msg-${message.id}-${index}`} className={`flex gap-4 ${message.role === "user" ? "justify-end" : "justify-start"}`}>
+                  {message.role === "assistant" && (
+                    <Avatar className="size-10 mt-1 flex-shrink-0">
+                      <AvatarFallback className="bg-primary text-primary-foreground">
+                        <Bot className="size-5" />
+                      </AvatarFallback>
+                    </Avatar>
+                  )}
+
+                  <div className={`max-w-[70%] ${message.role === "user" ? "order-first" : ""}`}>
+                    <div
+                      className={`rounded-2xl px-4 py-3 ${
+                        message.role === "user"
+                          ? "bg-primary text-primary-foreground shadow-sm"
+                          : "bg-card text-card-foreground shadow-sm border border-border"
+                      }`}
+                    >
+                      <p className="text-base leading-relaxed">{message.content}</p>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-2 px-2">{message.timestamp ? formatTime(message.timestamp) : ''}</p>
+                  </div>
+
+                  {message.role === "user" && (
+                    <Avatar className="size-10 mt-1 flex-shrink-0">
+                      <AvatarFallback className="bg-primary text-primary-foreground font-medium">JD</AvatarFallback>
+                    </Avatar>
+                  )}
+                </div>
+              ))}
+
+            </div>
+          </ScrollArea>
+
+          {/* Input Area */}
+          <div className="p-8 bg-transparent">
+            <div className="bg-card rounded-2xl p-1 max-w-3xl mx-auto shadow-sm border border-border focus-within:border-ring focus-within:ring-1 focus-within:ring-ring focus-within:shadow-none transition-colors relative">
+            <ShineBorder 
+              borderWidth={3}
+              duration={8}
+              shineColor={["#18ccfc", "#ff00ff", "#ffff00"]}
+              className="opacity-100"
+            />
+            <div className="relative">
+              <textarea
+                ref={inputRef as React.RefObject<HTMLTextAreaElement>}
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                onKeyPress={handleKeyPress as any}
+                placeholder="Reply to CmdShift..."
+                className="w-full bg-transparent border-none resize-none p-2 pl-3 focus:ring-0 focus:outline-none text-base text-card-foreground placeholder:text-muted-foreground shadow-none focus:shadow-none"
+                rows={1}
+                disabled={isStreaming}
+              />
+            </div>
+            <div className="flex items-center gap-2 mt-1 p-1">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-muted-foreground hover:bg-accent hover:text-accent-foreground rounded-lg"
+              >
+                <Plus className="size-5" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-muted-foreground hover:bg-accent hover:text-accent-foreground rounded-lg"
+              >
+                <Settings className="size-5" />
+              </Button>
+              <div className="flex-1"></div>
+              {/* Model Selector */}
+              <div className="relative">
+                <Button
+                  variant="outline"
+                  onClick={() => setModelOpen(!modelOpen)}
+                  className="w-[120px] justify-between border-border text-foreground hover:bg-accent hover:text-accent-foreground bg-transparent text-sm shadow-none"
+                >
+                  {selectedModel}
+                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+                {modelOpen && (
+                  <div
+                    className={`absolute ${messages.length === 0 ? "top-full mt-1" : "bottom-full mb-1"} w-[120px] bg-popover border border-border rounded-md overflow-hidden z-50`}
+                  >
+                    {models.map((model) => (
+                      <button
+                        key={model.value}
+                        onClick={() => {
+                          setSelectedModel(model.label)
+                          setModelOpen(false)
+                        }}
+                        className="w-full px-3 py-2 text-left text-sm text-popover-foreground hover:bg-accent hover:text-accent-foreground flex items-center gap-2"
+                      >
+                        <Check className={`h-4 w-4 ${selectedModel === model.label ? "opacity-100" : "opacity-0"}`} />
+                        {model.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <Button
+                onClick={handleSendMessage}
+                disabled={!inputValue.trim() || isStreaming}
+                className="bg-primary hover:bg-primary/90 text-primary-foreground size-10 p-0 rounded-lg shadow-sm"
+              >
+                <Send className="size-5" />
+              </Button>
+            </div>
+          </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}

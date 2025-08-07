@@ -96,75 +96,97 @@ export function InputArea({
   const isNearLimit = characterCount > maxLength * 0.9;
 
   return (
-    <div className="border-t bg-background">
-      <div className="max-w-4xl mx-auto px-4 py-4">
-        <div className="relative">
-          <Textarea
-            ref={textareaRef}
-            value={input}
-            onChange={handleChange}
-            onKeyDown={handleKeyDown}
-            onFocus={() => setIsFocused(true)}
-            onBlur={() => setIsFocused(false)}
-            onCompositionStart={() => { isComposing.current = true; }}
-            onCompositionEnd={() => { isComposing.current = false; }}
-            placeholder={placeholder}
-            disabled={isDisabled}
-            className={cn(
-              "pr-12 resize-none min-h-[56px] max-h-[200px]",
-              isDisabled && "opacity-50 cursor-not-allowed"
-            )}
-            style={{
-              height: '56px',
-              lineHeight: '1.5',
-            }}
-            rows={1}
-          />
+    <div className="border-t border-[#2a2a2d] bg-[#18181a]">
+      <div className="max-w-3xl mx-auto p-4">
+        <div className="relative rounded-2xl bg-[#1e1e20] border border-[#2a2a2d] shadow-xl transition-all duration-300 hover:border-[#3b82f6]/20">
+          <div className="p-4">
+            <div className="relative">
+              <Textarea
+                ref={textareaRef}
+                value={input}
+                onChange={handleChange}
+                onKeyDown={handleKeyDown}
+                onFocus={() => setIsFocused(true)}
+                onBlur={() => setIsFocused(false)}
+                onCompositionStart={() => { isComposing.current = true; }}
+                onCompositionEnd={() => { isComposing.current = false; }}
+                placeholder={placeholder}
+                disabled={isDisabled}
+                className={cn(
+                  "pr-12 resize-none min-h-[56px] max-h-[200px]",
+                  "bg-transparent",
+                  "border-0 focus:ring-0",
+                  "text-[#fafafa]",
+                  "placeholder-[#71717a]",
+                  isDisabled && "opacity-50 cursor-not-allowed"
+                )}
+                style={{
+                  height: '56px',
+                  lineHeight: '1.6',
+                }}
+                rows={1}
+              />
 
-          {/* Character counter */}
-          <div className="absolute bottom-2 left-4 text-xs text-muted-foreground">
-            {isFocused && (
-              <span className={cn(
-                isNearLimit && "text-orange-500"
-              )}>
-                {characterCount}/{maxLength}
+              {/* Character counter */}
+              <div className="absolute bottom-2 left-0 text-[11px] text-[#71717a]">
+                {isFocused && (
+                  <span className={cn(
+                    "transition-colors duration-200",
+                    isNearLimit && "text-[#ef4444]"
+                  )}>
+                    {characterCount}/{maxLength}
+                  </span>
+                )}
+              </div>
+
+              {/* Send button */}
+              <div className="absolute bottom-2 right-2">
+                <Button
+                  onClick={handleSubmit}
+                  disabled={!canSend}
+                  size="sm"
+                  className={cn(
+                    "h-8 w-8 p-0 rounded-lg",
+                    "bg-[#3b82f6] hover:bg-[#3b82f6]/90",
+                    "text-white",
+                    "transition-all duration-200",
+                    "shadow-lg hover:shadow-xl",
+                    !canSend && "opacity-30 bg-[#2a2a2d]"
+                  )}
+                  title={`Send message (${shortcutHint})`}
+                >
+                  {isLoading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Send className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
+            </div>
+
+            {/* Keyboard shortcut hint */}
+            <div className="mt-3 flex items-center justify-between">
+              <span className="text-[11px] text-[#71717a]">
+                Press <kbd className="
+                  px-1.5 py-0.5 
+                  bg-[#2a2a2d] 
+                  rounded-md 
+                  text-[#a1a1aa]
+                  border border-[#2a2a2d]
+                  font-mono text-[10px]
+                ">{shortcutHint}</kbd> to send
               </span>
-            )}
-          </div>
-
-          {/* Send button */}
-          <div className="absolute bottom-2 right-2">
-            <Button
-              onClick={handleSubmit}
-              disabled={!canSend}
-              size="sm"
-              className={cn(
-                "h-8 w-8 p-0",
-                !canSend && "opacity-50"
+              {!isFocused && characterCount > 0 && (
+                <span className={cn(
+                  "text-[11px] text-[#71717a]",
+                  "transition-colors duration-200",
+                  isNearLimit && "text-[#ef4444]"
+                )}>
+                  {characterCount}/{maxLength}
+                </span>
               )}
-              title={`Send message (${shortcutHint})`}
-            >
-              {isLoading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Send className="h-4 w-4" />
-              )}
-            </Button>
+            </div>
           </div>
-        </div>
-
-        {/* Keyboard shortcut hint */}
-        <div className="mt-2 text-xs text-muted-foreground flex items-center justify-between">
-          <span>
-            Press <kbd className="px-1.5 py-0.5 bg-muted rounded text-foreground">{shortcutHint}</kbd> to send
-          </span>
-          {!isFocused && characterCount > 0 && (
-            <span className={cn(
-              isNearLimit && "text-orange-500"
-            )}>
-              {characterCount}/{maxLength}
-            </span>
-          )}
         </div>
       </div>
     </div>

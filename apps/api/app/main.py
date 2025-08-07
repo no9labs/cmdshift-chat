@@ -49,6 +49,13 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=[
+        "X-Conversation-Id",
+        "X-Messages-Remaining", 
+        "X-Selected-Model",
+        "X-Message-Count",
+        "X-Request-Id"
+    ],
 )
 
 # Sentry middleware
