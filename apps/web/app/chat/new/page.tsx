@@ -1,13 +1,19 @@
 'use client'
 
 import { ChatInterface } from '@/components/chat-interface'
+import { useConversations } from '@/hooks/useConversations'
 
 export default function NewChatPage() {
-  const conversationId = `conv_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+  const { addConversation, updateConversationTitle } = useConversations()
+  const conversationId = `conv_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`
 
   return (
     <div className="h-full">
-      <ChatInterface conversationId={conversationId} />
+      <ChatInterface 
+        conversationId={conversationId}
+        onConversationCreated={addConversation}
+        onTitleGenerated={updateConversationTitle}
+      />
     </div>
   )
 }
