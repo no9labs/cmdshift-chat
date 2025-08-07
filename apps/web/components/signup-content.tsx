@@ -11,7 +11,6 @@ import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Separator } from "@/components/ui/separator"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { ThemeToggle } from "@/components/theme-toggle"
 import {
   Mail,
   Lock,
@@ -238,9 +237,6 @@ export function SignupContent() {
 
   return (
     <div className="relative">
-      <div className="absolute top-4 right-4">
-        <ThemeToggle />
-      </div>
       <Card className="w-full max-w-md bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 shadow-lg hover:border-[#3A4D6F]/20 dark:hover:border-[#3A4D6F]/30 transition-colors duration-200">
         <CardHeader className="text-center pb-6">
           <div className="flex justify-center mb-6">

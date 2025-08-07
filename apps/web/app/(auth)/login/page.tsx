@@ -3,6 +3,7 @@
 import { LoginForm } from "@/components/login-form"
 import { Globe } from "@/components/magicui/globe"
 import { DotPattern } from "@/components/magicui/dot-pattern"
+import { ThemeToggle } from "@/components/theme-toggle"
 import Image from "next/image"
 import { useEffect, useState } from "react"
 import { useTheme } from "@/hooks/useTheme"
@@ -78,6 +79,11 @@ export default function LoginPage() {
   
   return (
     <div className="min-h-screen w-full flex lg:grid lg:grid-cols-2">
+      {/* Theme toggle in top right */}
+      <div className="fixed top-4 right-4 z-50">
+        <ThemeToggle />
+      </div>
+      
       <div className="flex-1 flex flex-col bg-white dark:bg-gradient-to-br dark:from-zinc-950 dark:to-zinc-900">
         {/* Logo in top left corner */}
         <div className="absolute top-8 left-8 z-10">

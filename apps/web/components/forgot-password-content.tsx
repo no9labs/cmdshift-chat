@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { ThemeToggle } from "@/components/theme-toggle"
 import { Mail, ArrowLeft, CheckCircle, SquareTerminal } from "lucide-react"
 import Link from "next/link"
 
@@ -30,9 +29,6 @@ export function ForgotPasswordContent() {
   if (isSubmitted) {
     return (
       <div className="relative">
-        <div className="absolute top-4 right-4">
-          <ThemeToggle />
-        </div>
         <Card className="w-full max-w-md bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 shadow-lg hover:border-[#3A4D6F]/20 dark:hover:border-[#3A4D6F]/30 transition-colors duration-200">
           <CardHeader className="text-center pb-6">
             <div className="flex justify-center mb-4">
@@ -75,9 +71,6 @@ export function ForgotPasswordContent() {
 
   return (
     <div className="relative">
-      <div className="absolute top-4 right-4">
-        <ThemeToggle />
-      </div>
       <Card className="w-full max-w-md bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 shadow-lg hover:border-[#3A4D6F]/20 dark:hover:border-[#3A4D6F]/30 transition-colors duration-200">
         <CardHeader className="text-center pb-6">
           <div className="flex justify-center mb-6">
