@@ -11,6 +11,16 @@ import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { MagicCard } from "@/components/magicui/magic-card"
+import { Meteors } from "@/components/magicui/meteors"
+import { ThemeToggle } from "@/components/theme-toggle"
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
 import { useTheme } from "@/hooks/useTheme"
 import {
   Palette,
@@ -32,6 +42,7 @@ import {
   Settings2,
   CheckCircle2,
   XCircle,
+  Home,
 } from "lucide-react"
 
 export function SettingsContent() {
@@ -221,35 +232,60 @@ export function SettingsContent() {
   }
 
   return (
-    <div className="flex flex-col h-full bg-background">
-      {/* Alert Notification */}
-      {alertState.show && (
-        <div className="fixed top-4 right-4 z-50 animate-in fade-in slide-in-from-top-2">
-          <Alert className="w-96 border-zinc-800 bg-zinc-900/95 backdrop-blur">
-            <div className="flex items-center gap-2">
-              {alertState.type === 'success' ? (
-                <CheckCircle2 className="h-4 w-4 text-green-400" />
-              ) : (
-                <XCircle className="h-4 w-4 text-red-400" />
-              )}
-              <AlertDescription className="text-slate-200">
-                {alertState.message}
-              </AlertDescription>
+    <div className="flex flex-col h-full bg-sidebar relative">
+      {/* Full-height card with meteors */}
+      <div className="absolute inset-6 bg-white dark:bg-black rounded-3xl border border-border/50 shadow-2xl overflow-hidden">
+        <Meteors number={20} />
+        
+        {/* Content inside the card */}
+        <div className="relative z-10 flex flex-col h-full">
+          {/* Alert Notification */}
+          {alertState.show && (
+            <div className="fixed top-4 right-4 z-50 animate-in fade-in slide-in-from-top-2">
+              <Alert className="w-96 border-border bg-card/95 backdrop-blur">
+                <div className="flex items-center gap-2">
+                  {alertState.type === 'success' ? (
+                    <CheckCircle2 className="h-4 w-4 text-green-400" />
+                  ) : (
+                    <XCircle className="h-4 w-4 text-red-400" />
+                  )}
+                  <AlertDescription className="text-card-foreground">
+                    {alertState.message}
+                  </AlertDescription>
+                </div>
+              </Alert>
             </div>
-          </Alert>
-        </div>
-      )}
+          )}
 
-      {/* Header */}
-      <div className="p-6 bg-background flex-shrink-0">
-        <div>
-          <h1 className="text-2xl font-semibold text-foreground">Settings</h1>
-          <p className="text-base text-muted-foreground mt-1">Customize your CmdShift experience</p>
-        </div>
-      </div>
+          {/* Header with Breadcrumb */}
+          <div className="p-8 flex items-center justify-between">
+            <Breadcrumb>
+              <BreadcrumbList>
+                <BreadcrumbItem>
+                  <BreadcrumbLink href="/" className="flex items-center gap-1">
+                    <Home className="h-4 w-4" />
+                    Home
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbPage>Settings</BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
+            <ThemeToggle />
+          </div>
 
-      {/* Content */}
-      <div className="flex-1 overflow-y-auto p-6">
+          {/* Title */}
+          <div className="px-8 pb-6">
+            <div>
+              <h1 className="text-2xl font-semibold text-foreground">Settings</h1>
+              <p className="text-base text-muted-foreground mt-1">Customize your CmdShift experience</p>
+            </div>
+          </div>
+
+          {/* Content */}
+          <div className="flex-1 overflow-y-auto px-8 pb-8">
         <div className="max-w-4xl mx-auto space-y-6">
           <Tabs defaultValue="appearance" className="w-full">
             <TabsList className="grid w-full grid-cols-5 bg-card border-0 shadow-none drop-shadow-none [&>*]:shadow-none [&>*]:drop-shadow-none [&>*]:border-0 [&>*]:outline-none">
@@ -1008,6 +1044,8 @@ export function SettingsContent() {
             >
               Reset to Defaults
             </Button>
+          </div>
+            </div>
           </div>
         </div>
       </div>

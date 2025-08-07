@@ -10,6 +10,16 @@ import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { MagicCard } from "@/components/magicui/magic-card"
+import { Meteors } from "@/components/magicui/meteors"
+import { ThemeToggle } from "@/components/theme-toggle"
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
 import {
   User,
   CreditCard,
@@ -25,6 +35,7 @@ import {
   Palette,
   CheckCircle2,
   XCircle,
+  Home,
 } from "lucide-react"
 
 export function ProfileContent() {
@@ -209,37 +220,62 @@ export function ProfileContent() {
   }
 
   return (
-    <div className="flex flex-col h-full bg-background">
-      {/* Alert Notification */}
-      {alertState.show && (
-        <div className="fixed top-4 right-4 z-50 animate-in fade-in slide-in-from-top-2">
-          <Alert className="w-96 border-border bg-card/95 backdrop-blur">
-            <div className="flex items-center gap-2">
-              {alertState.type === 'success' ? (
-                <CheckCircle2 className="h-4 w-4 text-green-400" />
-              ) : (
-                <XCircle className="h-4 w-4 text-red-400" />
-              )}
-              <AlertDescription className="text-card-foreground">
-                {alertState.message}
-              </AlertDescription>
+    <div className="flex flex-col h-full bg-sidebar relative">
+      {/* Full-height card with meteors */}
+      <div className="absolute inset-6 bg-white dark:bg-black rounded-3xl border border-border/50 shadow-2xl overflow-hidden">
+        <Meteors number={20} />
+        
+        {/* Content inside the card */}
+        <div className="relative z-10 flex flex-col h-full">
+          {/* Alert Notification */}
+          {alertState.show && (
+            <div className="fixed top-4 right-4 z-50 animate-in fade-in slide-in-from-top-2">
+              <Alert className="w-96 border-border bg-card/95 backdrop-blur">
+                <div className="flex items-center gap-2">
+                  {alertState.type === 'success' ? (
+                    <CheckCircle2 className="h-4 w-4 text-green-400" />
+                  ) : (
+                    <XCircle className="h-4 w-4 text-red-400" />
+                  )}
+                  <AlertDescription className="text-card-foreground">
+                    {alertState.message}
+                  </AlertDescription>
+                </div>
+              </Alert>
             </div>
-          </Alert>
-        </div>
-      )}
+          )}
 
-      {/* Header */}
-      <div className="p-6 bg-background flex-shrink-0">
-        <div>
-          <h1 className="text-2xl font-semibold text-foreground">Profile</h1>
-          <p className="text-base text-muted-foreground mt-1">
-            Manage your account settings and preferences
-          </p>
-        </div>
-      </div>
+          {/* Header with Breadcrumb */}
+          <div className="p-8 flex items-center justify-between">
+            <Breadcrumb>
+              <BreadcrumbList>
+                <BreadcrumbItem>
+                  <BreadcrumbLink href="/" className="flex items-center gap-1">
+                    <Home className="h-4 w-4" />
+                    Home
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbPage>Profile</BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
+            <ThemeToggle />
+          </div>
 
-      {/* Content */}
-      <div className="flex-1 overflow-y-auto p-6">
+          {/* Title */}
+          <div className="px-8 pb-6">
+            <div>
+              <h1 className="text-2xl font-semibold text-foreground">Profile</h1>
+              <p className="text-base text-muted-foreground mt-1">
+              Manage your account settings and preferences
+            </p>
+            </div>
+          </div>
+
+          {/* Content */}
+          <div className="flex-1 overflow-y-auto px-8 pb-8">
         <div className="max-w-4xl mx-auto space-y-6">
           {/* Profile Info Card */}
           <MagicCard className="rounded-xl border border-border shadow-sm">
@@ -564,6 +600,8 @@ export function ProfileContent() {
             </CardContent>
           </Card>
           </MagicCard>
+            </div>
+          </div>
         </div>
       </div>
     </div>
