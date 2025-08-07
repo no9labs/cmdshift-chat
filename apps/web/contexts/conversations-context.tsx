@@ -76,19 +76,15 @@ export function ConversationsProvider({ children }: { children: ReactNode }) {
 
   // Add a new conversation with full control over its properties
   const addConversation = useCallback((conversation: Conversation) => {
-    console.log('[ConversationsContext] addConversation called with:', conversation)
     setConversations(prev => {
-      console.log('[ConversationsContext] Previous conversations:', prev)
       // Check if conversation already exists
       const exists = prev.some(c => c.id === conversation.id)
       if (exists) {
-        console.log('[ConversationsContext] Conversation already exists, skipping')
         return prev
       }
       
       // Add new conversation to the beginning
       const updated = [conversation, ...prev]
-      console.log('[ConversationsContext] Updated conversations:', updated)
       return updated
     })
   }, [])

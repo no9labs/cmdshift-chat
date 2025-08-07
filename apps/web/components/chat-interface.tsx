@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/breadcrumb"
 import { Send, Bot, Plus, Settings, Check, ChevronsUpDown, Home } from "lucide-react"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { useConversations } from "@/contexts/conversations-context"
 
 interface Message {
   id: string
@@ -40,8 +41,10 @@ export function ChatInterface({
   const [messages, setMessages] = useState<Message[]>([])
   const [inputValue, setInputValue] = useState("")
   const [isStreaming, setIsStreaming] = useState(false)
+  const [conversationTitle, setConversationTitle] = useState<string>("New Chat")
   const scrollAreaRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement | HTMLInputElement>(null)
+  const { conversations } = useConversations()
 
   const [selectedModel, setSelectedModel] = useState("Auto")
   const [modelOpen, setModelOpen] = useState(false)
@@ -74,12 +77,23 @@ export function ChatInterface({
     return () => observer.disconnect()
   }, [])
 
+  // Update title when conversation changes or conversations list updates
+  useEffect(() => {
+    if (conversationId && conversations.length > 0) {
+      const conversation = conversations.find(c => c.id === conversationId)
+      if (conversation && conversation.title) {
+        setConversationTitle(conversation.title)
+      }
+    }
+  }, [conversationId, conversations])
+
   // Load conversation messages when conversation ID changes
   useEffect(() => {
     const loadConversation = async () => {
       if (!conversationId) return
       
       try {
+        // Load messages
         const response = await fetch(`http://localhost:8001/api/v1/conversations/${conversationId}/messages?user_id=692a4738-5530-4627-8950-04d40d9b7d7e`)
         
         if (response.ok) {
@@ -147,8 +161,6 @@ export function ChatInterface({
       // Check for new conversation ID in response headers
       let newConversationId: string | null = null
       const conversationHeader = response.headers.get('X-Conversation-Id')
-      console.log('[ChatInterface] Response headers X-Conversation-Id:', conversationHeader)
-      console.log('[ChatInterface] onConversationCreated function:', onConversationCreated)
       
       if (conversationHeader) {
         newConversationId = conversationHeader
@@ -161,7 +173,6 @@ export function ChatInterface({
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString()
           }
-          console.log('[ChatInterface] Calling onConversationCreated with:', newConversation)
           onConversationCreated(newConversation)
         }
       }
@@ -228,6 +239,11 @@ export function ChatInterface({
           
           if (titleResponse.ok) {
             const titleData = await titleResponse.json()
+            
+            // Update local state
+            if (titleData.title) {
+              setConversationTitle(titleData.title)
+            }
             
             // Use the new updateConversationTitle method instead of onTitleGenerated
             if (onTitleGenerated && titleData.title && targetConversationId) {
@@ -422,7 +438,7 @@ export function ChatInterface({
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
                   <BreadcrumbPage>
-                    {messages.length > 1 ? "Getting started with React" : "New Chat"}
+                    {conversationTitle}
                   </BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
