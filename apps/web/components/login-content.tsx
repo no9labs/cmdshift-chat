@@ -25,6 +25,7 @@ import {
   Shield,
   AlertCircle,
   CheckCircle2,
+  SquareTerminal,
 } from "lucide-react"
 import Link from "next/link"
 
@@ -144,15 +145,7 @@ export function LoginContent() {
           {/* Logo */}
           <div className="flex justify-center mb-6">
             <div className="bg-zinc-900 rounded-xl p-3 shadow-sm">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path
-                  d="M9 9V15M15 9V15M9 12H15M17 19H7C4.79086 19 3 17.2091 3 15V9C3 6.79086 4.79086 5 7 5H17C19.2091 5 21 6.79086 21 9V15C21 17.2091 19.2091 19 17 19Z"
-                  stroke="white"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
+              <SquareTerminal className="w-8 h-8 text-white" />
             </div>
           </div>
 
