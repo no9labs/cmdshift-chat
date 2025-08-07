@@ -146,8 +146,12 @@ export function ChatInterface({
 
       // Check for new conversation ID in response headers
       let newConversationId: string | null = null
-      if (response.headers.get('X-Conversation-Id')) {
-        newConversationId = response.headers.get('X-Conversation-Id')
+      const conversationHeader = response.headers.get('X-Conversation-Id')
+      console.log('[ChatInterface] Response headers X-Conversation-Id:', conversationHeader)
+      console.log('[ChatInterface] onConversationCreated function:', onConversationCreated)
+      
+      if (conversationHeader) {
+        newConversationId = conversationHeader
         
         // Add the new conversation to state
         if (onConversationCreated && newConversationId) {
@@ -157,6 +161,7 @@ export function ChatInterface({
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString()
           }
+          console.log('[ChatInterface] Calling onConversationCreated with:', newConversation)
           onConversationCreated(newConversation)
         }
       }

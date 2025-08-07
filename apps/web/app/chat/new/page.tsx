@@ -1,7 +1,7 @@
 'use client'
 
 import { ChatInterface } from '@/components/chat-interface'
-import { useConversations } from '@/hooks/useConversations'
+import { useConversations } from '@/contexts/conversations-context'
 
 export default function NewChatPage() {
   const { addConversation, updateConversationTitle } = useConversations()

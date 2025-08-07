@@ -2,8 +2,7 @@
 
 import { Sidebar } from "@/components/sidebar"
 import { ChatInterface } from "@/components/chat-interface"
-import { ConversationsProvider } from "@/contexts/conversations-context"
-import { useConversations } from "@/hooks/useConversations"
+import { ConversationsProvider, useConversations } from "@/contexts/conversations-context"
 
 function HomeContent() {
   const { addConversation, updateConversationTitle } = useConversations()
