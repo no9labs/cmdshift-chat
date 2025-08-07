@@ -4,6 +4,7 @@ import { LoginForm } from "@/components/login-form"
 import { Globe } from "@/components/magicui/globe"
 import { DotPattern } from "@/components/magicui/dot-pattern"
 import { Meteors } from "@/components/magicui/meteors"
+import { InteractiveGridPattern } from "@/components/magicui/interactive-grid-pattern"
 import { ThemeToggle } from "@/components/theme-toggle"
 import Image from "next/image"
 import { useEffect, useState } from "react"
@@ -115,6 +116,15 @@ export default function LoginPage() {
         </div>
       </div>
       <div className="hidden lg:block relative bg-gradient-to-br from-zinc-100 via-white to-zinc-100 dark:from-zinc-900 dark:via-zinc-800 dark:to-zinc-900 overflow-hidden">
+        {/* Interactive Grid Pattern */}
+        <InteractiveGridPattern 
+          width={30}
+          height={30}
+          squares={[30, 20]}
+          className="absolute inset-0 h-full w-full opacity-30 dark:opacity-20"
+          squaresClassName="stroke-zinc-400/30 dark:stroke-zinc-600/30 [&:hover]:fill-primary/10 dark:[&:hover]:fill-primary/5"
+        />
+        
         {/* Meteors background */}
         <Meteors number={20} />
         
