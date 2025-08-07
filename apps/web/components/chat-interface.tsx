@@ -17,6 +17,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 import { Send, Bot, Plus, Settings, Check, ChevronsUpDown, Home } from "lucide-react"
+import { ThemeToggle } from "@/components/theme-toggle"
 
 interface Message {
   id: string
@@ -275,7 +276,7 @@ export function ChatInterface({
           {/* Content inside the card */}
           <div className="relative z-10 flex flex-col h-full">
             {/* Chat Header */}
-            <div className="p-8">
+            <div className="p-8 flex items-center justify-between">
               <Breadcrumb>
                 <BreadcrumbList>
                   <BreadcrumbItem>
@@ -290,6 +291,7 @@ export function ChatInterface({
                   </BreadcrumbItem>
                 </BreadcrumbList>
               </Breadcrumb>
+              <ThemeToggle />
             </div>
 
             {/* Centered Content */}
@@ -403,7 +405,7 @@ export function ChatInterface({
         {/* Content inside the card */}
         <div className="relative z-10 flex flex-col h-full">
           {/* Chat Header */}
-          <div className="p-8">
+          <div className="p-8 flex items-center justify-between">
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem>
@@ -420,6 +422,7 @@ export function ChatInterface({
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
+            <ThemeToggle />
           </div>
 
           {/* Messages Area */}
