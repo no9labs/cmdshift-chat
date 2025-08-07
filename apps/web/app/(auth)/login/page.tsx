@@ -93,7 +93,7 @@ export default function LoginPage() {
           cx={1}
           cy={1}
           cr={1}
-          className="[mask-image:radial-gradient(600px_circle_at_center,white,transparent)] opacity-50 dark:opacity-30"
+          className="[mask-image:radial-gradient(600px_circle_at_center,white,transparent)] opacity-70 dark:opacity-50"
         />
         
         {/* Logo in top left corner */}
