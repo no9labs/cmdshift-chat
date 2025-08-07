@@ -2,6 +2,7 @@
 
 import type React from "react"
 import { useState, useRef, useEffect } from "react"
+import Image from "next/image"
 import { ShineBorder } from "@/components/magicui/shine-border"
 import { Meteors } from "@/components/magicui/meteors"
 import { Button } from "@/components/ui/button"
@@ -43,6 +44,7 @@ export function ChatInterface({
 
   const [selectedModel, setSelectedModel] = useState("Auto")
   const [modelOpen, setModelOpen] = useState(false)
+  const [logoSrc, setLogoSrc] = useState("/cmd-logo-no-padding.svg")
 
   const models = [
     { value: "auto", label: "Auto" },
@@ -50,6 +52,26 @@ export function ChatInterface({
     { value: "glm", label: "GLM" },
     { value: "qwen", label: "Qwen" },
   ]
+
+  // Update logo based on theme
+  useEffect(() => {
+    const updateLogo = () => {
+      const root = window.document.documentElement
+      const isDark = root.classList.contains('dark')
+      setLogoSrc(isDark ? "/cmd-logo-no-padding.svg" : "/cmd-logo-inverted.svg")
+    }
+
+    updateLogo()
+    
+    // Watch for theme changes
+    const observer = new MutationObserver(updateLogo)
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class']
+    })
+
+    return () => observer.disconnect()
+  }, [])
 
   // Load conversation messages when conversation ID changes
   useEffect(() => {
@@ -276,16 +298,15 @@ export function ChatInterface({
             {/* Quote with Logo */}
             <div className="text-center space-y-4">
               <div className="flex items-center justify-center gap-3 mb-6">
-                <div className="bg-primary rounded-lg p-2 shadow-sm">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path
-                      d="M9 9V15M15 9V15M9 12H15M17 19H7C4.79086 19 3 17.2091 3 15V9C3 6.79086 4.79086 5 7 5H17C19.2091 5 21 6.79086 21 9V15C21 17.2091 19.2091 19 17 19Z"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
+                <div className="relative w-10 h-10">
+                  <Image
+                    src={logoSrc}
+                    alt="CmdShift Logo"
+                    width={40}
+                    height={40}
+                    className="object-contain"
+                    priority
+                  />
                 </div>
                 <h1 className="text-2xl font-medium text-foreground">What's on your mind today?</h1>
               </div>
